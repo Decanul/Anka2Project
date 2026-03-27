@@ -23,89 +23,85 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 		CHARACTER_MANAGER();
 		virtual ~CHARACTER_MANAGER();
 
-		void Destroy();
+		void			Destroy();
 
-		void GracefulShutdown();
+		void			GracefulShutdown();
 
-		DWORD AllocVID();
+		DWORD			AllocVID();
 
-		LPCHARACTER CreateCharacter(const char * name, DWORD dwPID = 0);
+		LPCHARACTER		CreateCharacter(const char * name, DWORD dwPID = 0);
 
 		void DestroyCharacter(LPCHARACTER ch);
-		void DestroyCharacterInMap(long lMapIndex);
 
-		void Update(int iPulse);
+		void			Update(int iPulse);
+		void 			DestroyCharacterInMap(long lMapIndex);
 
 #ifdef ENABLE_SHOW_MOB_INFO
 		LPCHARACTER SpawnMob(DWORD dwVnum, long lMapIndex, long x, long y, long z, bool bSpawnMotion = false, int iRot = -1, bool bShow = true, bool bAggressive = false);
 #else
 		LPCHARACTER SpawnMob(DWORD dwVnum, long lMapIndex, long x, long y, long z, bool bSpawnMotion = false, int iRot = -1, bool bShow = true);
 #endif
-		LPCHARACTER SpawnMobRange(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException=false, bool bSpawnMotion = false , bool bAggressive = false);
-		LPCHARACTER SpawnGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen = NULL, bool bAggressive_ = false, LPDUNGEON pDungeon = NULL);
-		bool SpawnGroupGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen = NULL, bool bAggressive_ = false, LPDUNGEON pDungeon = NULL);
-		bool SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, int tx, int ty, LPREGEN pkRegen = NULL, bool bAggressive_ = false);
-		LPCHARACTER SpawnMobRandomPosition(DWORD dwVnum, long lMapIndex);
-#ifdef STONE_REGEN_FIX
-		LPCHARACTER		SpawnMobStone(DWORD dwType, DWORD dwVnum, long lMapIndex, long x, long y, long z, bool bSpawnMotion = false, int iRot = -1, bool bShow = true, bool bAggressive = false);
-		LPCHARACTER		SpawnMobRangeStone(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException = false, bool bSpawnMotion = false, bool bAggressive = false);
-#endif
+		LPCHARACTER		SpawnMobRange(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException=false, bool bSpawnMotion = false , bool bAggressive = false);
+		LPCHARACTER		SpawnGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen = NULL, bool bAggressive_ = false, LPDUNGEON pDungeon = NULL);
+		bool			SpawnGroupGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen = NULL, bool bAggressive_ = false, LPDUNGEON pDungeon = NULL);
+		bool			SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, int tx, int ty, LPREGEN pkRegen = NULL, bool bAggressive_ = false);
+		LPCHARACTER		SpawnMobRandomPosition(DWORD dwVnum, long lMapIndex, bool is_aggressive = false);
 
-		void SelectStone(LPCHARACTER pkChrStone);
+		void			SelectStone(LPCHARACTER pkChrStone);
 
-		NAME_MAP & GetPCMap() { return m_map_pkPCChr; }
+		NAME_MAP &		GetPCMap() { return m_map_pkPCChr; }
 
-		LPCHARACTER Find(DWORD dwVID);
-		LPCHARACTER Find(const VID & vid);
-		LPCHARACTER FindPC(const char * name);
-		LPCHARACTER FindByPID(DWORD dwPID);
+		LPCHARACTER		Find(DWORD dwVID);
+		LPCHARACTER		Find(const VID & vid);
+		LPCHARACTER		FindPC(const char * name);
+		LPCHARACTER		FindByPID(DWORD dwPID);
 
-		bool AddToStateList(LPCHARACTER ch);
-		void RemoveFromStateList(LPCHARACTER ch);
+		bool			AddToStateList(LPCHARACTER ch);
+		void			RemoveFromStateList(LPCHARACTER ch);
 
-		void DelayedSave(LPCHARACTER ch);
-		bool FlushDelayedSave(LPCHARACTER ch);
-		void ProcessDelayedSave();
+		void                    DelayedSave(LPCHARACTER ch);
+		bool                    FlushDelayedSave(LPCHARACTER ch);
+		void			ProcessDelayedSave();
 
 		template<class Func>	Func for_each_pc(Func f);
 
-		void RegisterForMonsterLog(LPCHARACTER ch);
-		void UnregisterForMonsterLog(LPCHARACTER ch);
-		void PacketMonsterLog(LPCHARACTER ch, const void* buf, int size);
+		void			RegisterForMonsterLog(LPCHARACTER ch);
+		void			UnregisterForMonsterLog(LPCHARACTER ch);
+		void			PacketMonsterLog(LPCHARACTER ch, const void* buf, int size);
 
-		void KillLog(DWORD dwVnum);
+		void			KillLog(DWORD dwVnum);
 
-		void RegisterRaceNum(DWORD dwVnum);
-		void RegisterRaceNumMap(LPCHARACTER ch);
-		void UnregisterRaceNumMap(LPCHARACTER ch);
-		bool GetCharactersByRaceNum(DWORD dwRaceNum, CharacterVectorInteractor & i);
+		void			RegisterRaceNum(DWORD dwVnum);
+		void			RegisterRaceNumMap(LPCHARACTER ch);
+		void			UnregisterRaceNumMap(LPCHARACTER ch);
+		bool			GetCharactersByRaceNum(DWORD dwRaceNum, CharacterVectorInteractor & i);
 
-		LPCHARACTER FindSpecifyPC(unsigned int uiJobFlag, long lMapIndex, LPCHARACTER except=NULL, int iMinLevel = 1, int iMaxLevel = PLAYER_MAX_LEVEL_CONST);
+		LPCHARACTER		FindSpecifyPC(unsigned int uiJobFlag, long lMapIndex, LPCHARACTER except=NULL, int iMinLevel = 1, int iMaxLevel = PLAYER_MAX_LEVEL_CONST);
 
-		void SetMobItemRate(int value) { m_iMobItemRate = value; }
-		void SetMobDamageRate(int value) { m_iMobDamageRate = value; }
-		void SetMobGoldAmountRate(int value) { m_iMobGoldAmountRate = value; }
-		void SetMobGoldDropRate(int value) { m_iMobGoldDropRate = value; }
-		void SetMobExpRate(int value) { m_iMobExpRate = value; }
+		void			SetMobItemRate(int value)	{ m_iMobItemRate = value; }
+		void			SetMobDamageRate(int value)	{ m_iMobDamageRate = value; }
+		void			SetMobGoldAmountRate(int value)	{ m_iMobGoldAmountRate = value; }
+		void			SetMobGoldDropRate(int value)	{ m_iMobGoldDropRate = value; }
+		void			SetMobExpRate(int value)	{ m_iMobExpRate = value; }
 
-		void SetMobItemRatePremium(int value) { m_iMobItemRatePremium = value; }
-		void SetMobGoldAmountRatePremium(int value) { m_iMobGoldAmountRatePremium = value; }
-		void SetMobGoldDropRatePremium(int value) { m_iMobGoldDropRatePremium = value; }
-		void SetMobExpRatePremium(int value) { m_iMobExpRatePremium = value; }
+		void			SetMobItemRatePremium(int value)	{ m_iMobItemRatePremium = value; }
+		void			SetMobGoldAmountRatePremium(int value)	{ m_iMobGoldAmountRatePremium = value; }
+		void			SetMobGoldDropRatePremium(int value)	{ m_iMobGoldDropRatePremium = value; }
+		void			SetMobExpRatePremium(int value)		{ m_iMobExpRatePremium = value; }
 
-		void SetUserDamageRatePremium(int value) { m_iUserDamageRatePremium = value; }
-		void SetUserDamageRate(int value ) { m_iUserDamageRate = value; }
-		int GetMobItemRate(LPCHARACTER ch);
-		int GetMobDamageRate(LPCHARACTER ch);
-		int GetMobGoldAmountRate(LPCHARACTER ch);
-		int GetMobGoldDropRate(LPCHARACTER ch);
-		int GetMobExpRate(LPCHARACTER ch);
+		void			SetUserDamageRatePremium(int value)	{ m_iUserDamageRatePremium = value; }
+		void			SetUserDamageRate(int value ) { m_iUserDamageRate = value; }
+		int			GetMobItemRate(LPCHARACTER ch);
+		int			GetMobDamageRate(LPCHARACTER ch);
+		int			GetMobGoldAmountRate(LPCHARACTER ch);
+		int			GetMobGoldDropRate(LPCHARACTER ch);
+		int			GetMobExpRate(LPCHARACTER ch);
 
-		int GetUserDamageRate(LPCHARACTER ch);
-		void SendScriptToMap(long lMapIndex, const std::string & s); 
+		int			GetUserDamageRate(LPCHARACTER ch);
+		void		SendScriptToMap(long lMapIndex, const std::string & s);
 
-		bool BeginPendingDestroy();
-		void FlushPendingDestroy();
+		bool			BeginPendingDestroy();
+		void			FlushPendingDestroy();
 #ifdef ENABLE_REAL_TIME_REGEN
 		void			EraseRealTimeRegenCharacter(WORD wNum);
 		LPCHARACTER		FindRealTimeRegenMonster(WORD wNum);

@@ -290,6 +290,12 @@ class GameWindow(ui.ScriptWindow):
 		snd.SetMusicVolume(systemSetting.GetMusicVolume()*net.GetFieldMusicVolume())
 		snd.SetSoundVolume(systemSetting.GetSoundVolume())
 
+		if app.ENABLE_FOG_FIX:
+			if systemSetting.IsFogMode():
+				background.SetEnvironmentFog(TRUE)
+			else:
+				background.SetEnvironmentFog(FALSE)
+
 		netFieldMusicFileName = net.GetFieldMusicFileName()
 		if netFieldMusicFileName:
 			snd.FadeInMusic("BGM/" + netFieldMusicFileName)
@@ -319,14 +325,11 @@ class GameWindow(ui.ScriptWindow):
 		
 		self.RecvReadWiki()
 
+		# ex) cubeInformation[20383] = [ {"rewordVNUM": 72723, "rewordCount": 1, "materialInfo": "101,1&102,2", "price": 999 }, ... ]
 		self.cubeInformation = {}
 		self.currentCubeNPC = 0
-
-		if app.ENABLE_FOG_FIX:
-			if systemSetting.IsFogMode():
-				background.SetEnvironmentFog(TRUE)
-			else:
-				background.SetEnvironmentFog(FALSE)
+		self.isCameraMoving = True
+		self.cameraMovementProgress = 0.0
 
 	def Close(self):
 		self.Hide()
@@ -642,7 +645,7 @@ class GameWindow(ui.ScriptWindow):
 		#	onClickKeyDict[app.DIK_TAB] = lambda: self.__PressTabKey()
 
 		if app.ENABLE_RANKING:
-			onPressKeyDict[app.DIK_Z] = lambda : self.interface.OpenRanking()
+			onPressKeyDict[app.DIK_J] = lambda : self.interface.OpenRanking()
 
 		self.onClickKeyDict=onClickKeyDict
 
@@ -860,6 +863,8 @@ class GameWindow(ui.ScriptWindow):
 			self.testPKMode.SetText("Current PK Mode : " + self.pkModeNameDict.get(curPKMode, "UNKNOWN"))
 			self.testAlignment.SetText("Current Alignment : " + str(alignment) + " (" + localeInfo.TITLE_NAME_LIST[grade] + ")")
 
+	###############################################################################################
+	###############################################################################################
 	## Game Callback Functions
 
 	# Start
@@ -1124,6 +1129,7 @@ class GameWindow(ui.ScriptWindow):
 
 	# SHOW_LOCAL_MAP_NAME
 	def ShowMapName(self, mapName, x, y):
+
 		if self.mapNameShower:
 			self.mapNameShower.ShowMapName(mapName, x, y)
 
@@ -1267,9 +1273,10 @@ class GameWindow(ui.ScriptWindow):
 
 		partyLeaderVID = self.partyInviteQuestionDialog.partyLeaderVID
 
-		distance = player.GetCharacterDistance(partyLeaderVID)
-		if distance < 0.0 or distance > 5000:
-			answer = FALSE
+		# Removed the distance limit for joining a party.
+		#distance = player.GetCharacterDistance(partyLeaderVID)
+		#if distance < 0.0 or distance > 5000:
+		#	answer = False
 
 		net.SendPartyInviteAnswerPacket(partyLeaderVID, answer)
 
@@ -1371,6 +1378,7 @@ class GameWindow(ui.ScriptWindow):
 		self.guildInviteQuestionDialog = guildInviteQuestionDialog
 
 	def AnswerGuildInvite(self, answer):
+
 		if not self.guildInviteQuestionDialog:
 			return
 
@@ -1415,7 +1423,10 @@ class GameWindow(ui.ScriptWindow):
 		if self.interface.wndCharacter:
 			self.interface.wndCharacter.ActEmotion(emotionIndex)
 
+	###############################################################################################
+	###############################################################################################
 	## Keyboard Functions
+
 	def CheckFocus(self):
 		if FALSE == self.IsFocus():
 			if TRUE == self.interface.IsOpenChat():
@@ -1442,7 +1453,7 @@ class GameWindow(ui.ScriptWindow):
 		# END_OF_SCREENSHOT_CWDSAVE
 
 		if succeeded:
-			pass
+			chat.AppendChat(chat.CHAT_TYPE_INFO, "%s %s %s" % (name, localeInfo.SCREENSHOT_SAVE1, localeInfo.SCREENSHOT_SAVE2))
 		else:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.SCREENSHOT_SAVE_FAILURE)
 
@@ -1521,33 +1532,38 @@ class GameWindow(ui.ScriptWindow):
 			else:
 				player.PickCloseItem()
 
+	###############################################################################################
+	###############################################################################################
 	## Event Handler
+
 	def OnKeyDown(self, key):
-		if self.interface.wndWeb and self.interface.wndWeb.IsShow():
+		if self.interface and self.interface.wndWeb and self.interface.wndWeb.IsShow():
 			return
 
 		if key == app.DIK_ESC:
-			self.RequestDropItem(FALSE)
+			self.RequestDropItem(False)
 			constInfo.SET_ITEM_QUESTION_DIALOG_STATUS(0)
 
-		try:
-			self.onPressKeyDict[key]()
-		except KeyError:
-			pass
-		except:
-			raise
+		if self.onPressKeyDict:
+			try:
+				self.onPressKeyDict[key]()
+			except KeyError:
+				pass
+			except:
+				raise
 
-		return TRUE
+		return True
 
 	def OnKeyUp(self, key):
-		try:
-			self.onClickKeyDict[key]()
-		except KeyError:
-			pass
-		except:
-			raise
+		if self.onClickKeyDict:
+			try:
+				self.onClickKeyDict[key]()
+			except KeyError:
+				pass
+			except:
+				raise
 
-		return TRUE
+		return True
 
 	def OnMouseLeftButtonDown(self):
 		if self.interface.BUILD_OnMouseLeftButtonDown():
@@ -1570,6 +1586,7 @@ class GameWindow(ui.ScriptWindow):
 			return
 
 		if mouseModule.mouseController.isAttached():
+
 			attachedType = mouseModule.mouseController.GetAttachedType()
 			attachedItemIndex = mouseModule.mouseController.GetAttachedItemIndex()
 			attachedItemSlotPos = mouseModule.mouseController.GetAttachedSlotNumber()
@@ -1592,6 +1609,7 @@ class GameWindow(ui.ScriptWindow):
 				else:
 					self.__PutItem(attachedType, attachedItemIndex, attachedItemSlotPos, attachedItemCount, self.PickingCharacterIndex)
 
+			## DragonSoul
 			elif app.ENABLE_AURA_COSTUME_SYSTEM and player.SLOT_TYPE_AURA == attachedType:
 				self.__PutItem(attachedType, attachedItemIndex, attachedItemSlotPos, attachedItemCount, self.PickingCharacterIndex)
 
@@ -1613,6 +1631,7 @@ class GameWindow(ui.ScriptWindow):
 			else:
 				player.SetMouseState(player.MBT_LEFT, player.MBS_CLICK)
 
+		#player.EndMouseWalking()
 		return TRUE
 
 	def __PutItem(self, attachedType, attachedItemIndex, attachedItemSlotPos, attachedItemCount, dstChrID):

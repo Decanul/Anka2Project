@@ -893,23 +893,33 @@ def SecondToHMS(time):
 
 	return text
 
+import localeInfo
+
 def RTSecondToDHMS(time):
 	text = ""
 	g = time // (24 * 3600)
-	time = time % (24 * 3600)
+	time %= (24 * 3600)
+
 	s = time // 3600
 	time %= 3600
+
 	d = time // 60
 	time %= 60
+
 	sn = time
+
 	if g:
-		text += "%dg " % g
+		text += "%d%s " % (g, localeInfo.DAY)
+
 	if text or s:
-		text += "%ds " % s
+		text += "%d%s " % (s, localeInfo.HOUR)
+
 	if text or d:
-		text += "%ddk. " % d
+		text += "%d%s " % (d, localeInfo.MINUTE)
+
 	if text or sn:
-		text += "%dsn. " % sn
+		text += "%d%s " % (sn, localeInfo.SECOND)
+
 	return text[:-1]
 
 if app.ENABLE_EVENT_SYSTEM:

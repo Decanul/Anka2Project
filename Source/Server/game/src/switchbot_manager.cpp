@@ -16,7 +16,7 @@ bool ValidPosition(DWORD wCell)
 	return wCell < SWITCHBOT_SLOT_COUNT;
 }
 
-const float c_fSpeed = 0.08f;
+const float c_fSpeed = 0.15f;
 
 bool SwitchbotHelper::IsValidItem(LPITEM pkItem)
 {

@@ -214,8 +214,8 @@ class RespDialog(ui.ScriptWindow):
         self.badgeLevelValue = self.GetChild("badge_level_value")
         self.badgeAffectValue = self.GetChild("badge_affect_value")
 
-        self.headerMobCheckbox = self.GetChild("header_mob_checkbox")
-        self.headerRespCheckbox = self.GetChild("header_resp_checkbox")
+        #self.headerMobCheckbox = self.GetChild("header_mob_checkbox")
+        #self.headerRespCheckbox = self.GetChild("header_resp_checkbox")
 
         self.loadingBar = self.GetChild("loading_bar")
         self.OpenWhenTeleportButton = self.GetChild("OpenWhenTeleportButton")
@@ -476,7 +476,9 @@ class RespDialog(ui.ScriptWindow):
             try:
                 data = pickle.load(file)
                 for key, value in data.items():
-                    self.GetChild(key).SetCheck(value)
+                    child = self.GetChild2(key)
+                    if child and hasattr(child, "SetCheck"):
+                        child.SetCheck(value)
             except ValueError:
                 pass
 
@@ -672,6 +674,8 @@ class RespDialog(ui.ScriptWindow):
 
     def Show(self):
         ui.ScriptWindow.Show(self)
+        if self.headerRespCheckbox:
+            self.headerRespCheckbox.Hide()
         # Ensure loading is closed when panel is opened
         self.__SetLoading(False)
 

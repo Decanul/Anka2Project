@@ -272,8 +272,8 @@ enum EPointTypes
 	POINT_NORMAL_HIT_DAMAGE_BONUS,	// 122
 	POINT_SKILL_DEFEND_BONUS,		// 123
 	POINT_NORMAL_HIT_DEFEND_BONUS,	// 124
-	//POINT_PC_BANG_EXP_BONUS,		// 125
-	//POINT_PC_BANG_DROP_BONUS,		// 126
+	POINT_PC_BANG_EXP_BONUS,		// 125
+	POINT_PC_BANG_DROP_BONUS,		// 126
 	POINT_RAMADAN_CANDY_BONUS_EXP,	// 127
 	POINT_ENERGY 					= 128,
 	POINT_ENERGY_END_TIME 			= 129,
@@ -359,8 +359,6 @@ enum EPointTypes
 #ifdef ENABLE_GAYA_SYSTEM
 	POINT_GEM 						= 180,
 #endif
-
-	//POINT_MAX_NUM = 129	common/length.h
 };
 
 enum EPKModes
@@ -2565,9 +2563,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void		SetRealTimeRegenNum(WORD num)	{ m_wRealTimeRegenNum = num; };
 		WORD		GetRealTimeRegenNum() 			{ return m_wRealTimeRegenNum; };
 
-#ifdef STONE_REGEN_FIX
 		LPREGEN		GetRegen();
-#endif
 
 	private:
 		WORD		m_wRealTimeRegenNum;

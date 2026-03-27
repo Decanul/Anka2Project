@@ -38,10 +38,10 @@ buttons_list = {
 		],
 		1: [
 		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON,			'index': 13,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
-		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON_02,		'index': 14,	'minLevel': 40,	'maxLevel': 110,	'costReq': 0,		'itemReq': 71095},
-		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON_03,		'index': 15,	'minLevel': 40,	'maxLevel': 110,	'costReq': 0,		'itemReq': 71095},
-		   {'btn_name': localeInfo.MAP_SKIPIA_DUNGEON_01,		'index': 16,	'minLevel': 75,	'maxLevel': 110,	'costReq': 0,		'itemReq': 30190},
-		   {'btn_name': localeInfo.MAP_SKIPIA_DUNGEON_02,		'index': 17,	'minLevel': 75,	'maxLevel': 110,	'costReq': 0,		'itemReq': 30190},
+		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON_02,		'index': 14,	'minLevel': 40,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SPIDERDUNGEON_03,		'index': 15,	'minLevel': 40,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SKIPIA_DUNGEON_01,		'index': 16,	'minLevel': 75,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SKIPIA_DUNGEON_02,		'index': 17,	'minLevel': 75,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
 		],
 		2: [
 		   {'btn_name': localeInfo.MAP_CAPE,					'index': 19,	'minLevel': 90,	'maxLevel': 110,	'costReq': 5000000,	'itemReq': 0},
@@ -244,7 +244,7 @@ class TeleportWindow(ui.ScriptWindow):
 			radioBtn.SetOverVisual('d:/ymir work/ui/game/teleport/subnav_image/{}_out.png'.format(buttons_list['subBoardsButtons'][navBtnIndex][i]['index']))
 			radioBtn.SetDownVisual('d:/ymir work/ui/game/teleport/subnav_image/{}_out.png'.format(buttons_list['subBoardsButtons'][navBtnIndex][i]['index']))
 			radioBtn.SetText('{}'.format(buttons_list['subBoardsButtons'][navBtnIndex][i]['btn_name']))
-			radioBtn.SetTextPosition(0, 20)
+			radioBtn.SetTextPosition(10, 50)
 			radioBtn.SetPosition(7 + col * (radioBtn.GetWidth() + 10), yPos + (25 + hPos) * row)
 			radioBtn.SetWindowHorizontalAlignLeft()
 			radioBtn.SetEvent(ui.__mem_func__(self.__OnPressSubBoardButton), i)
@@ -295,7 +295,7 @@ class TeleportWindow(ui.ScriptWindow):
 			btn.SetWindowHorizontalAlignLeft()
 			btn.SetPosition(7 + col * (btn.GetWidth() + 10), yPos + (25 + 40) * row)
 			btn.SetText('{}'.format(buttons_list['nav_btns'][i]['btn_name']))
-			btn.SetTextPosition(0, 20)
+			btn.SetTextPosition(10, 50)
 			btn.SetEvent(ui.__mem_func__(self.__OnPressNavButton), i)
 			self.navButtons.append(btn)
 

@@ -660,9 +660,19 @@ class AffectShower(ui.Window):
 
 	def __init__(self):
 		ui.Window.__init__(self)
+		self.isShowingAffects = True
 
 		self.serverPlayTime = 0
 		self.clientPlayTime = 0
+
+		self.showBtn = ui.Button()
+		self.showBtn.SetParent(self)
+		self.showBtn.SetUpVisual("d:/ymir work/ui/on_btn.png")
+		self.showBtn.SetOverVisual("d:/ymir work/ui/off_btn.png")
+		self.showBtn.SetDownVisual("d:/ymir work/ui/off_btn.png")
+		self.showBtn.SetPosition(0, 0)
+		self.showBtn.SetEvent(ui.__mem_func__(self.__OnClickToggleButton))
+		self.showBtn.Show()
 
 		self.lastUpdateTime = 0
 		self.affectImageDict = {}
@@ -695,6 +705,21 @@ class AffectShower(ui.Window):
 		self.affectImageDict = {}
 		self.__ArrangeImageList()
 
+	def __OnClickToggleButton(self):
+			self.isShowingAffects = not self.isShowingAffects
+			
+			# If we are showing them again, we must make sure the images are actually 'Shown'
+			for image in self.affectImageDict.values():
+				if self.isShowingAffects:
+					image.Show()
+				else:
+					image.Hide()
+					
+			if self.horseImage:
+				self.horseImage.Show() if self.isShowingAffects else self.horseImage.Hide()
+				
+			self.__ArrangeImageList()
+
 	def ClearAffects(self):
 		self.living_affectImageDict={}
 		for key, image in self.affectImageDict.items():
@@ -706,27 +731,27 @@ class AffectShower(ui.Window):
 	def SetLeaderShipStatus(self, status, pointIdx = 0, value = 0):
 		if not self.affectImageDict.has_key(AFF_LEADERSHIP):
 			self.BINARY_NEW_AddAffect(AFF_LEADERSHIP, 0, 0, 0)
-		
+
 		# AFF_LEADERSHIP key'i hala yoksa erken dönü?
 		if not self.affectImageDict.has_key(AFF_LEADERSHIP):
 			return
-		
+
 		ACTIVE_IMG = "d:/ymir work/ui/skill/common/affect/leadership.png"
 		DEACTIVE_IMG = "d:/ymir work/ui/skill/common/affect/leadership.png"
 
 		if self.affectImageDict[AFF_LEADERSHIP].toolTip == None:
 			self.affectImageDict[AFF_LEADERSHIP].toolTip = uiToolTip.ToolTip()
 			self.affectImageDict[AFF_LEADERSHIP].toolTip.HideToolTip()
-		
+
 		toolTip = self.affectImageDict[AFF_LEADERSHIP].toolTip
-		
+
 		toolTip.ClearToolTip()
 		toolTip.SetTitle(localeInfo.LEADERSHIP_TITLE)
 		toolTip.AppendDescription(localeInfo.LEADERSHIP_DESCRIPTION, 26)
 		toolTip.AppendSpace(5)
 		toolTip.AppendTextLine("--------------------------")
 		toolTip.AppendTextLine(localeInfo.LEADER_BONUS_RECIVED)
-		
+
 		if status == 1:
 			AFFECT_STRING_DICT = {
 				91 : localeInfo.PARTY_BONUS_ATTACKER,
@@ -736,13 +761,13 @@ class AffectShower(ui.Window):
 				110 : localeInfo.PARTY_BONUS_BERSERKER,
 				111 : localeInfo.PARTY_BONUS_DEFENDER,
 			}
-			
+
 			self.affectImageDict[AFF_LEADERSHIP].LoadImage(ACTIVE_IMG)
 			self.affectImageDict[AFF_LEADERSHIP].SetScale(0.7, 0.7)
-			
+
 			if AFFECT_STRING_DICT.has_key(pointIdx):
 				toolTip.AppendTextLine(AFFECT_STRING_DICT[pointIdx](value))
-			
+
 			toolTip.AppendSpace(5)
 			toolTip.AppendTextLine("--------------------------")
 			toolTip.AppendTextLine("Aktif")
@@ -782,6 +807,7 @@ class AffectShower(ui.Window):
 		   affect == chr.NEW_AFFECT_SKILL_BOOK_BONUS or\
 		   affect == chr.NEW_AFFECT_AUTO_SP_RECOVERY or\
 		   affect == chr.NEW_AFFECT_AUTO_HP_RECOVERY or\
+		   affect == chr.NEW_AFFECT_MULTI_FARM or\
 		   affect == chr.NEW_AFFECT_SKILL_BOOK_NO_DELAY:
 			duration = 0
 
@@ -940,7 +966,7 @@ class AffectShower(ui.Window):
 			image.Show()
 
 			self.horseImage=image
-			self.__ArrangeImageList()
+		self.__ArrangeImageList()
 
 	if app.ENABLE_CONQUEROR_LEVEL:
 		def SetSungMaAffectImage(self, str, hp, move, immune):
@@ -977,7 +1003,8 @@ class AffectShower(ui.Window):
 		image.SetSkillAffectFlag(TRUE)
 
 		if app.ENABLE_AFFECT_BUFF_REMOVE:
-			image.SetSkillIndex(skillIndex)
+			if skillIndex == 94 or skillIndex == 95 or skillIndex == 96 or skillIndex == 109 or skillIndex == 110 or skillIndex == 111:
+				image.SetSkillIndex(skillIndex)
 
 		try:
 			image.LoadImage(filename)
@@ -991,82 +1018,59 @@ class AffectShower(ui.Window):
 
 	def __RemoveAffect(self, affect):
 		if not self.affectImageDict.has_key(affect):
+			print "__RemoveAffect %s ( No Affect )" % affect
 			return
 
+		print "__RemoveAffect %s ( Affect )" % affect
 		del self.affectImageDict[affect]
 
 		self.__ArrangeImageList()
 
 	def __ArrangeImageList(self):
-		numberOnRow = 15
-		self.SetSize(numberOnRow * self.IMAGE_STEP, self.IMAGE_STEP_Y + 26 * 4)
+			numberOnRow = 10
+			
+			# Button tucked slightly into the corner
+			self.showBtn.SetPosition(-3, -3)
+			
+			if not self.isShowingAffects:
+				self.SetSize(32, 32)
+				if self.lovePointImage: self.lovePointImage.Hide()
+				if self.horseImage: self.horseImage.Hide()
+				if app.ENABLE_MULTI_FARM_BLOCK and hasattr(self, 'farmStatusImage') and self.farmStatusImage: self.farmStatusImage.Hide()
+				for image in self.affectImageDict.values(): image.Hide()
+				return 
 
-		xPos = 0
-		i = 0
-		width = 0
+			# --- SHOW LOGIC ---
+			self.SetSize(numberOnRow * self.IMAGE_STEP, 200)
 
-		if app.ENABLE_CONQUEROR_LEVEL:
-			if self.SungmaImage:
-				width += self.IMAGE_STEP
+			# Alignment Values:
+			# startX: Move the first row slightly left to 22 (closes the gap)
+			# rowTwoX: Set to 22 so it starts EXACTLY under the first icon of Row 1
+			startX = 22 
+			i = 0 
 
-		if self.lovePointImage:
-			if self.lovePointImage.IsShow():
-				self.lovePointImage.SetPosition(xPos, 0)
-				xPos += self.IMAGE_STEP
-				i = i + 1
+			iconList = []
+			if self.lovePointImage: iconList.append(self.lovePointImage)
+			if app.ENABLE_MULTI_FARM_BLOCK and hasattr(self, 'farmStatusImage') and self.farmStatusImage: iconList.append(self.farmStatusImage)
+			if self.horseImage: iconList.append(self.horseImage)
+			if app.ENABLE_CONQUEROR_LEVEL and hasattr(self, 'SungmaImage') and self.SungmaImage: iconList.append(self.SungmaImage)
+			
+			sortedKeys = sorted(self.affectImageDict.keys())
+			for key in sortedKeys:
+				iconList.append(self.affectImageDict[key])
 
-		if app.ENABLE_MULTI_FARM_BLOCK:
-			if self.farmStatusImage:
-				if self.farmStatusImage.IsShow():
-					self.farmStatusImage.SetPosition(xPos, 0)
-					xPos += self.IMAGE_STEP
-					i = i + 1
-
-		if app.ENABLE_GROWTH_PET_SYSTEM:
-			tempDict = {}
-			for value in self.petSkillaffectImageDict.values():
-				tempDict[value[0]] = value[1]
-
-			for value in range(1, 4):
-				if tempDict.has_key(value):
-					tempDict[value].SetPosition(xPos, 0)
-					xPos += self.IMAGE_STEP
-
-		if self.horseImage:
-			self.horseImage.SetPosition(xPos, 0)
-			xPos += self.IMAGE_STEP
-			i = i + 1
-
-		newDict = collections.OrderedDict(sorted(self.affectImageDict.items()))
-
-		if app.ENABLE_CONQUEROR_LEVEL:
-			if self.SungmaImage:
-				if self.SungmaImage.IsShow():
-					self.SungmaImage.SetPosition(xPos, 0)
-					xPos += self.IMAGE_STEP
-
-		for image in newDict.values():
-			if i >= numberOnRow and i < numberOnRow * 2:
-				image.SetPosition(xPos - (numberOnRow * self.IMAGE_STEP), self.IMAGE_STEP_Y + 26)
-				xPos += self.IMAGE_STEP
-				i = i + 1
-			elif i >= numberOnRow * 2 and i < numberOnRow * 3:
-				image.SetPosition(xPos - ((numberOnRow * 2) * self.IMAGE_STEP), self.IMAGE_STEP_Y + 52)
-				xPos += self.IMAGE_STEP
-				i = i + 1
-			elif i >= numberOnRow * 3 and i < numberOnRow * 4:
-				image.SetPosition(xPos - ((numberOnRow * 3) * self.IMAGE_STEP), self.IMAGE_STEP_Y + 52 + 26)
-				xPos += self.IMAGE_STEP
-				i = i + 1
-			elif i >= numberOnRow * 4:
-				image.SetPosition(xPos - ((numberOnRow * 4) * self.IMAGE_STEP), self.IMAGE_STEP_Y + 52 + 26 + 26)
-				xPos += self.IMAGE_STEP
-				i = i + 1
-			else:
-				image.SetPosition(xPos, 0)
-				xPos += self.IMAGE_STEP
-				i = i + 1
-
+			for icon in iconList:
+				icon.Show()
+				row = i // numberOnRow
+				col = i % numberOnRow
+				
+				# Logic: Every row starts at the same X-coordinate (startX)
+				# This makes the "F" icon and the "Shield" icon below it line up perfectly
+				xPos = startX + (col * self.IMAGE_STEP)
+				yPos = row * 28 # Vertical gap
+				
+				icon.SetPosition(xPos, yPos)
+				i += 1
 	if app.ENABLE_MULTI_FARM_BLOCK:
 		def __OnClickMultiFarm(self, emptyArg):
 			multiFarmBlockDialog = uiCommon.QuestionDialog("thin")

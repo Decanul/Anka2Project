@@ -19,6 +19,7 @@
 		<File ArchivedPath="intrologo.py"><![CDATA[../binary_unpack/root/intrologo.py]]></File>
 		<File ArchivedPath="introselect.py"><![CDATA[../binary_unpack/root/introselect.py]]></File>
 		<File ArchivedPath="localeinfo.py"><![CDATA[../binary_unpack/root/localeinfo.py]]></File>
+		<File ArchivedPath="localeinfo.py.bak"><![CDATA[../binary_unpack/root/localeinfo.py.bak]]></File>
 		<File ArchivedPath="mousemodule.py"><![CDATA[../binary_unpack/root/mousemodule.py]]></File>
 		<File ArchivedPath="musicinfo.py"><![CDATA[../binary_unpack/root/musicinfo.py]]></File>
 		<File ArchivedPath="networkmodule.py"><![CDATA[../binary_unpack/root/networkmodule.py]]></File>
@@ -141,11 +142,13 @@
 		<File ArchivedPath="uistone_event.py"><![CDATA[../binary_unpack/root/uistone_event.py]]></File>
 		<File ArchivedPath="uisungmahi.py"><![CDATA[../binary_unpack/root/uisungmahi.py]]></File>
 		<File ArchivedPath="uiswitchbot.py"><![CDATA[../binary_unpack/root/uiswitchbot.py]]></File>
+		<File ArchivedPath="uiswitchbot.py.bak"><![CDATA[../binary_unpack/root/uiswitchbot.py.bak]]></File>
 		<File ArchivedPath="uisystem.py"><![CDATA[../binary_unpack/root/uisystem.py]]></File>
 		<File ArchivedPath="uitabledungeon.py"><![CDATA[../binary_unpack/root/uitabledungeon.py]]></File>
 		<File ArchivedPath="uitarget.py"><![CDATA[../binary_unpack/root/uitarget.py]]></File>
 		<File ArchivedPath="uitaskbar.py"><![CDATA[../binary_unpack/root/uitaskbar.py]]></File>
 		<File ArchivedPath="uiteleport.py"><![CDATA[../binary_unpack/root/uiteleport.py]]></File>
+		<File ArchivedPath="uiteleport.py.bak"><![CDATA[../binary_unpack/root/uiteleport.py.bak]]></File>
 		<File ArchivedPath="uitip.py"><![CDATA[../binary_unpack/root/uitip.py]]></File>
 		<File ArchivedPath="uitooltip.py"><![CDATA[../binary_unpack/root/uitooltip.py]]></File>
 		<File ArchivedPath="uitrack.py"><![CDATA[../binary_unpack/root/uitrack.py]]></File>
@@ -204,7 +207,6 @@
 		<File ArchivedPath="uiscript/exchangedialog.py"><![CDATA[../binary_unpack/root/uiscript/exchangedialog.py]]></File>
 		<File ArchivedPath="uiscript/expandedmoneytaskbar.py"><![CDATA[../binary_unpack/root/uiscript/expandedmoneytaskbar.py]]></File>
 		<File ArchivedPath="uiscript/expandedtaskbar.py"><![CDATA[../binary_unpack/root/uiscript/expandedtaskbar.py]]></File>
-		<File ArchivedPath="uiscript/expandedtaskbar.py.bak"><![CDATA[../binary_unpack/root/uiscript/expandedtaskbar.py.bak]]></File>
 		<File ArchivedPath="uiscript/fishinggamewindow.py"><![CDATA[../binary_unpack/root/uiscript/fishinggamewindow.py]]></File>
 		<File ArchivedPath="uiscript/fishingwindow.py"><![CDATA[../binary_unpack/root/uiscript/fishingwindow.py]]></File>
 		<File ArchivedPath="uiscript/floorinfo.py"><![CDATA[../binary_unpack/root/uiscript/floorinfo.py]]></File>

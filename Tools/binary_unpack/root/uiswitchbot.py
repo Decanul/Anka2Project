@@ -28,8 +28,10 @@ COLOR_SELECTED = grp.GenerateColor(1.0, 1.0, 1.0, 1.0)
 
 SKILL_DAMAGE_BONUS_MAX = 20
 NORMAL_HIT_DAMAGE_BONUS_MAX = 50
-ADDON_TYPES = {item.APPLY_SKILL_DAMAGE_BONUS : SKILL_DAMAGE_BONUS_MAX, item.APPLY_NORMAL_HIT_DAMAGE_BONUS : NORMAL_HIT_DAMAGE_BONUS_MAX}
-
+ADDON_TYPES = {
+	71: SKILL_DAMAGE_BONUS_MAX, 
+	119: NORMAL_HIT_DAMAGE_BONUS_MAX
+}
 BOARD_WIDTH = 472
 BOARD_HEIGHT = 373
 
@@ -57,7 +59,11 @@ ATTR_SLOT_COUNT = 5
 def GetAffectString(affectType, affectValue):
 	if not affectType:
 		return None
-
+	if affectType == 72 or affectType == item.APPLY_NORMAL_HIT_DAMAGE_BONUS:
+		return "Average Damage {}%".format(affectValue)
+		
+	if affectType == 71 or affectType == item.APPLY_SKILL_DAMAGE_BONUS:
+		return "Skill Damage {}%".format(affectValue)
 	try:
 		return ItemToolTip.AFFECT_DICT[affectType](affectValue)
 	except TypeError:
@@ -120,8 +126,8 @@ class SwitchbotItemTab(ui.ScriptWindow):
 		self.selectButton.SetDownVisual("d:/ymir work/ui/switchbot/buttons/but_swithcbot_down.tga")
 		self.selectButton.SetWindowHorizontalAlignCenter()
 		self.selectButton.SetPosition(0, 4)
-		self.selectButton.SetText(constInfo.NumberToStrRomanNumerals(self.slot_num+1))
-		self.selectButton.SetTextPosition(1, -1)
+		self.selectButton.SetText(str(self.slot_num+1))
+		self.selectButton.SetTextPosition(8, 8)
 		self.selectButton.Show()
 
 		self.slotImage = ui.ExpandedImageBox()
@@ -599,8 +605,8 @@ class SwitchbotWindow(ui.NewBoardWithTitleBar):
 			alternativeButton.SetDownVisual("d:/ymir work/ui/switchbot/buttons/but_swithcbot_down.tga")
 			alternativeButton.SetWindowVerticalAlignCenter()
 			alternativeButton.SetPosition(108 + (alternativeButton.GetWidth() * i) + (i * 5), 0)
-			alternativeButton.SetText(constInfo.NumberToStrRomanNumerals(i+1))
-			alternativeButton.SetTextPosition(1, -1)
+			alternativeButton.SetText(str(i+1))
+			alternativeButton.SetTextPosition(8, 8)
 			alternativeButton.SetEvent(lambda arg = i : self.SelectAlternative(arg))
 			alternativeButton.Show()
 
@@ -823,76 +829,90 @@ class SwitchbotWindow(ui.NewBoardWithTitleBar):
 		self.__RefreshButtons()
 
 	def __OnSearchAttribute(self, attrIdx):
-		if self.attributeSearchWindow:
-			self.attributeSearchWindow.Close()
-			del self.attributeSearchWindow
+			if self.attributeSearchWindow:
+				self.attributeSearchWindow.Close()
+				del self.attributeSearchWindow
 
-		self.attrSearchIdx = attrIdx
+			self.attrSearchIdx = attrIdx
+			
+			# 1. Create the window
+			wnd = SearchListWindow()
+			self.attributeSearchWindow = wnd
+			
+			# 2. Setup Dimensions FIRST
+			width = 260
+			height = 280
+			wnd.MakeWindow(width, height)
+			wnd.SetTitleName(localeInfo.SWITCHBOT_SELECT_ATTR)
+			wnd.SetAcceptArgsType("KEY_VALUE")
 
-		wnd = SearchListWindow()
-		width = 260
-		height = 260
-		wnd.MakeWindow(width, height)
-		wnd.SetTitleName(localeInfo.SWITCHBOT_SELECT_ATTR)
-		wnd.SetAcceptArgsType("KEY_VALUE")
+			# 3. Calculate Position (Mouse centered)
+			(mouseX, mouseY) = wndMgr.GetMousePosition()
+			xPos = max(0, min(mouseX - width/2, wndMgr.GetScreenWidth() - width))
+			yPos = max(0, min(mouseY - height/2, wndMgr.GetScreenHeight() - height))
+			
+			# Set position before opening
+			wnd.SetPosition(xPos, yPos)
 
-		(mouseX, mouseY) = wndMgr.GetMousePosition()
+			# 4. Identify Item and Add Bonuses
+			itemVnum = player.GetItemIndex(player.SWITCHBOT, self.selectedSlot)
+			if itemVnum:
+				item.SelectItem(itemVnum)
+				# Add Avg/Skill if it's a weapon
+				if item.GetItemType() == item.ITEM_TYPE_WEAPON:
+					for addonType, maxValue in ADDON_TYPES.iteritems():
+						name = GetAffectString(addonType, maxValue)
+						if name:
+							wnd.AppendItem(addonType, name)
 
-		if mouseX + width/2 > wndMgr.GetScreenWidth():
-			xPos = wndMgr.GetScreenWidth() - width
-		elif mouseX - width/2 < 0:
-			xPos = 0
-		else:
-			xPos = mouseX - width/2
+				# Add standard bonuses from server
+				attributes = switchbot.GetAttributesForSet(self.selectedSlot)
+				for (type, value) in attributes:
+					name = GetAffectString(type, value)
+					if name:
+						wnd.AppendItem(type, name)
 
-		if mouseY + height/2 > wndMgr.GetScreenHeight():
-			yPos = wndMgr.GetScreenHeight() - height
-		elif mouseY - height/2 < 0:
-			yPos = 0
-		else:
-			yPos = mouseY - height/2
+			# 5. Finalize Window
+			wnd.SetAcceptEvent(ui.__mem_func__(self.__OnAcceptSearch))
+			wnd.SetCancelEvent(ui.__mem_func__(self.__OnCancelSearch))
+			
+			wnd.Show() # Use Show() instead of Open() if Open() resets position
+			wnd.SetTop()
+			
+			# Force position again after Show() to ensure it's not at 0,0
+			wnd.SetPosition(xPos, yPos)
+		
+			# If it's a weapon, add Avg/Skill
+			if item.GetItemType() == item.ITEM_TYPE_WEAPON:
+				for addonType, maxValue in ADDON_TYPES.iteritems():
+					name = GetAffectString(addonType, maxValue)
+					if name:
+						wnd.AppendItem(addonType, name)
 
-		wnd.SetPosition(xPos, yPos)	
+			# Standard attributes
+			attributes = switchbot.GetAttributesForSet(self.selectedSlot)
+			for (type, value) in attributes:
+				name = GetAffectString(type, value)
+				if name:
+					wnd.AppendItem(type, name)
+			# Get standard attributes from server
+			attributes = switchbot.GetAttributesForSet(self.selectedSlot)
+			selectedAttributes = [switchbot.GetAttribute(self.selectedSlot, self.alternative, i)[0] for i in xrange(ATTR_SLOT_COUNT)]
 
-		firstAttrType = player.GetItemAttribute(player.SWITCHBOT, self.selectedSlot, 0)[0]
-		if firstAttrType in ADDON_TYPES.keys():
-			for addonType, maxValue in ADDON_TYPES.iteritems():
-				affectString = GetAffectString(addonType, maxValue)
-				if not affectString:
+			for (type, value) in attributes:
+				if type in selectedAttributes:
 					continue
+				
+				affectString = GetAffectString(type, value)
+				if affectString:
+					wnd.AppendItem(type, affectString)
 
-				wnd.AppendItem(addonType, affectString)
-
-		attributes = switchbot.GetAttributesForSet(self.selectedSlot)
-
-		selectedAttributes = [switchbot.GetAttribute(self.selectedSlot, self.alternative, attrIndex)[0] for attrIndex in xrange(ATTR_SLOT_COUNT)]
-
-		for (type, value) in attributes:
-			if type in selectedAttributes:
-				continue
-
-			save_bonus = TRUE
-			item.SelectItem(player.GetItemIndex(player.SWITCHBOT, self.selectedSlot))
-			for i in xrange(item.ITEM_APPLY_MAX_NUM):
-				if type == item.GetAffect(i)[0]:
-					save_bonus = FALSE
-					break
-			if save_bonus is FALSE:
-				continue
-
-			affectString = GetAffectString(type, value)
-			if not affectString:
-				continue
-
-			wnd.AppendItem(type, affectString)
-
-		wnd.SetAcceptEvent(ui.__mem_func__(self.__OnAcceptSearch))
-		wnd.SetCancelEvent(ui.__mem_func__(self.__OnCancelSearch))
-		wnd.SetTop()
-		wnd.Open()
-
-		self.attributeSearchWindow = wnd
-
+			wnd.SetAcceptEvent(ui.__mem_func__(self.__OnAcceptSearch))
+			wnd.SetCancelEvent(ui.__mem_func__(self.__OnCancelSearch))
+			wnd.SetTop()
+			wnd.Open()
+			self.attributeSearchWindow = wnd
+			
 	def __OnAcceptSearch(self, key, value):
 		if self.attrSearchIdx < 0 or self.attrSearchIdx >= ATTR_SLOT_COUNT:
 			return

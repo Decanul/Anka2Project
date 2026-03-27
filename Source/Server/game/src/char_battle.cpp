@@ -2346,14 +2346,6 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 		}
 	}
 #endif
-
-#ifdef STONE_REGEN_FIX
-	if (!IsPC() && !GetDungeon() && IsStone())
-	{
-		if (GetRegen() != NULL)
-			regen_event_create(GetRegen());
-	}
-#endif
 }
 
 // DevFix 29
@@ -2588,6 +2580,12 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
         SetHP(30000);
     }
 #endif
+
+	if (IsPC() && IsObserverMode() && IsDead()) // @fixme204
+		return false;
+
+	if (!GetSectree() || GetSectree()->IsAttr(GetX(), GetY(), ATTR_BANPK))
+		return false;
 
 #ifdef ENABLE_SUNG_MAHI_TOWER
 	if (pAttacker && pAttacker->IsPC())

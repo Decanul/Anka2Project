@@ -124,10 +124,6 @@ static bool read_line(FILE *fp, LPREGEN regen)
 					regen->type = REGEN_TYPE_MOB;
 				else if (szTmp[0] == 'g')
 					regen->type = REGEN_TYPE_GROUP;
-#ifdef STONE_REGEN_FIX
-				else if (szTmp[0] == 'a')
-					regen->type = REGEN_TYPE_STONE;
-#endif
 				else if (szTmp[0] == 'e')
 					regen->type = REGEN_TYPE_EXCEPTION;
 				else if (szTmp[0] == 'r')
@@ -188,6 +184,7 @@ static bool read_line(FILE *fp, LPREGEN regen)
 
 			case MODE_Z_SECTION:
 				str_to_number(regen->z_section, szTmp);
+
 				if (regen->type == REGEN_TYPE_EXCEPTION)
 					return true;
 
@@ -287,7 +284,7 @@ static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 
 		if (regen->type == REGEN_TYPE_ANYWHERE)
 		{
-			ch = CHARACTER_MANAGER::instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex);
+			ch = CHARACTER_MANAGER::instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex, regen->is_aggressive); //@fixme195
 
 			if (ch)
 			{
@@ -315,7 +312,7 @@ static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 		{
 			if (regen->type == REGEN_TYPE_MOB)
 			{
-				ch = CHARACTER_MANAGER::Instance().SpawnMobRange(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, true);
+				ch = CHARACTER_MANAGER::Instance().SpawnMobRange(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, true, false, regen->is_aggressive); // @fixme195
 
 				if (ch)
 				{
@@ -362,22 +359,9 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 	{
 		LPCHARACTER ch = NULL;
 
-#ifdef STONE_REGEN_FIX
-		if (regen->type == REGEN_TYPE_STONE)
-		{
-			ch = CHARACTER_MANAGER::Instance().SpawnMobRangeStone(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, true, regen->is_aggressive, regen->is_aggressive);
-			if (ch) {
-				++regen->count;
-				ch->SetRegen(regen);
-				continue;
-			}
-		}
-		else if (regen->type == REGEN_TYPE_ANYWHERE)
-#else
 		if (regen->type == REGEN_TYPE_ANYWHERE)
-#endif
 		{
-			ch = CHARACTER_MANAGER::instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex);
+			ch = CHARACTER_MANAGER::instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex, regen->is_aggressive); //@fixme195
 
 			if (ch)
 				++regen->count;
@@ -397,11 +381,7 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 		}
 		else
 		{
-#ifdef STONE_REGEN_FIX
-			if (regen->type == REGEN_TYPE_MOB || regen->type == REGEN_TYPE_STONE)
-#else
 			if (regen->type == REGEN_TYPE_MOB)
-#endif
 			{
 				ch = CHARACTER_MANAGER::Instance().SpawnMobRange(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, true, regen->is_aggressive, regen->is_aggressive );
 
@@ -469,25 +449,20 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 
 	while (true)
 	{
-		REGEN tmp;
-
-		memset(&tmp, 0, sizeof(tmp));
+		REGEN tmp{};
 
 		if (!read_line(fp, &tmp))
 			break;
 
 		if (tmp.type == REGEN_TYPE_MOB ||
 			tmp.type == REGEN_TYPE_GROUP ||
-#ifdef STONE_REGEN_FIX
-			tmp.type == REGEN_TYPE_STONE ||
-#endif
 			tmp.type == REGEN_TYPE_GROUP_GROUP ||
 			tmp.type == REGEN_TYPE_ANYWHERE)
 		{
 			if (!bOnce)
 			{
 				regen = M2_NEW REGEN;
-				memcpy(regen, &tmp, sizeof(REGEN));
+				*regen = tmp;
 			}
 			else
 				regen = &tmp;
@@ -572,9 +547,7 @@ bool regen_load_in_file(const char* filename, long lMapIndex, int base_x, int ba
 
 	while (true)
 	{
-		REGEN tmp;
-
-		memset(&tmp, 0, sizeof(tmp));
+		REGEN tmp{};
 
 		if (!read_line(fp, &tmp))
 			break;
@@ -636,35 +609,21 @@ EVENTFUNC(regen_event)
 	regen_event_info* info = dynamic_cast<regen_event_info*>( event->info );
 
 	if ( info == NULL )
-    {
+	{
 		sys_err( "regen_event> <Factor> Null pointer" );
 		return 0;
-    }
+	}
 
-	LPREGEN    regen = info->regen;
-
-#ifdef ENABLE_REGEN_RENEWAL
-	if (!regen)
-		return 0;
-#endif
+	LPREGEN	regen = info->regen;
 
 	if (!is_valid_regen(regen))
 		return 0;
 
-#ifdef ENABLE_REGEN_RENEWAL
-	if (regen->nextRespawn)
-	{
-		if (regen->nextRespawn <= time(0))
-			regen_spawn(regen, false);
-	}
-	else
-		regen_spawn(regen, false);
+	if (regen->time == 0)
+		regen->event = NULL;
 
-	return PASSES_PER_SEC(60 * 60 * 24);
-#else
-    regen_spawn(regen, false);
-	return PASSES_PER_SEC(60 * 60 * 24);
-#endif
+	regen_spawn(regen, false);
+	return PASSES_PER_SEC(regen->time);
 }
 
 bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
@@ -683,9 +642,7 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 
 	while (true)
 	{
-		REGEN tmp;
-
-		memset(&tmp, 0, sizeof(tmp));
+		REGEN tmp{};
 
 		if (!read_line(fp, &tmp))
 			break;
@@ -693,9 +650,6 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 		if (tmp.type == REGEN_TYPE_MOB ||
 			tmp.type == REGEN_TYPE_GROUP ||
 			tmp.type == REGEN_TYPE_GROUP_GROUP ||
-#ifdef STONE_REGEN_FIX
-			tmp.type == REGEN_TYPE_STONE ||
-#endif
 			tmp.type == REGEN_TYPE_ANYWHERE)
 		{
 			if (test_server)
@@ -704,7 +658,7 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 			}
 
 			regen = M2_NEW REGEN;
-			memcpy(regen, &tmp, sizeof(REGEN));
+			*regen = tmp;
 			INSERT_TO_TW_LIST(regen, regen_list, prev, next);
 
 			regen->lMapIndex = lMapIndex;
@@ -794,39 +748,6 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 	fclose(fp);
 	return true;
 }
-
-#ifdef STONE_REGEN_FIX
-void regen_event_create(LPREGEN regen)
-{
-	if (!regen || regen->type != REGEN_TYPE_STONE)
-		return;
-
-	long delayPasses = 0;
-
-	if (regen->time != 0)
-	{
-#ifdef ENABLE_REGEN_RENEWAL
-		delayPasses = PASSES_PER_SEC(1);
-#else
-		delayPasses = PASSES_PER_SEC(number(0, 16)) + PASSES_PER_SEC(regen->time);
-#endif
-	}
-	else
-	{
-		const CMob* pMob = CMobManager::instance().Get(regen->vnum);
-		int sec = (pMob && pMob->m_table.bRegenCycle > 0) ? (int)pMob->m_table.bRegenCycle : 60;
-		if (sec < 1)
-			sec = 1;
-		delayPasses = PASSES_PER_SEC(sec);
-	}
-
-	event_cancel(&regen->event);
-
-	regen_event_info* info = AllocEventInfo<regen_event_info>();
-	info->regen = regen;
-	regen->event = event_create(regen_event, info, delayPasses);
-}
-#endif
 
 void regen_free(void)
 {

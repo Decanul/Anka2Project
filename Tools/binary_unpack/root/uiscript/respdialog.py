@@ -82,16 +82,16 @@ window = {
 
                                                     "text": uiScriptLocale.RESP_MOB_HEADER,
                                                 },
-                                                {
-                                                    "name": "header_mob_checkbox",
-                                                    "type": "resp_checkbox",
-
-                                                    "x": 42,
-                                                    "y": 6,
-
-                                                    "width": 15,
-                                                    "height": 13,
-                                                },
+                                                #{
+                                                #    "name": "header_mob_checkbox",
+                                                #    "type": "resp_checkbox",
+                                                #
+                                                #    "x": 42,
+                                                #    "y": 6,
+                                                #
+                                                #    "width": 15,
+                                                #    "height": 13,
+                                                #},
                                             ),
                                     },
                                 ),
@@ -143,16 +143,16 @@ window = {
 
                                                     "text": "Ork Reisi (Sev. 50)",
                                                 },
-                                                {
-                                                    "name": "header_resp_checkbox",
-                                                    "type": "resp_checkbox",
-
-                                                    "x": 42,
-                                                    "y": 6,
-
-                                                    "width": 15,
-                                                    "height": 13,
-                                                },
+                                                #{
+                                                #    "name": "header_resp_checkbox",
+                                                #    "type": "resp_checkbox",
+                                                #
+                                                #    "x": 42,
+                                                #    "y": 6,
+                                                #
+                                                #    "width": 15,
+                                                #    "height": 13,
+                                                #},
                                                 {
                                                     "name": "drop_button",
                                                     "type": "button",

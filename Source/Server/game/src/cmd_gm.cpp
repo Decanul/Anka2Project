@@ -948,11 +948,6 @@ struct FuncPurge
 		)
 
 		{
-#ifdef STONE_REGEN_FIX
-			if (!pkChr->IsPC() && !pkChr->GetDungeon() && pkChr->IsStone())
-				if (pkChr->GetRegen() != NULL)
-					regen_event_create(pkChr->GetRegen());
-#endif
 			M2_DESTROY_CHARACTER(pkChr);
 		}
 	}

@@ -262,7 +262,6 @@ enum eCommonDefines {
 #define ENABLE_FIX_EXP_DROP_STONES 					// Metin (Stone) yaratýklarýndan EXP düþme hesaplamalarýnda oluþan hatalarý giderir.
 #define ENABLE_MULTI_AFFIX_APPLY_SYSTEM 			// Tek iþlemde birden fazla efsun (bonus) eklenmesini saðlar.
 #define ENABLE_REGEN_RENEWAL 						// Regen event’lerinin baþlatýlma zamanýný sabitleyerek rastgele gecikmeleri ortadan kaldýrýr ve daha tutarlý spawn döngüsü saðlar.
-#define STONE_REGEN_FIX 							// Metin (Stone) yaratýklarýnýn yeniden doðma sýrasýnda oluþan animasyon, konum ve stabilite problemlerini giderir.
 #define FIX_SyncPosition                       		// Pozisyon senkronizasyon sorunlarýný düzeltir
 #define ENABLE_PROXY_IP								// Proxy/VPN tespiti ve reverse-proxy arkasýndaki gerçek istemci IP'sinin doðru okunmasýný saðlayarak IP algýlama hatalarýný düzeltir
 #define ENABLE_UDP_BLOCK							// UDP port engellemeyi etkinleþtir;

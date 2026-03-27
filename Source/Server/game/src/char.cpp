@@ -6873,6 +6873,14 @@ void CHARACTER::OnMove(bool bIsAttack)
 		{
 			ClearAffectedEunhyung();
 		}
+		// @fixme229 START //Canavarlar guvenli alana giremez.
+		SECTREE* sectree = GetSectree();
+		if (sectree && sectree->IsAttr(GetX(), GetY(), ATTR_BANPK) && IsMonster())
+			//Return();
+		{
+			M2_DESTROY_CHARACTER(this); // Canavarlari siler.
+		}
+		// @fixme229 END
 	}
 
 	// MINING
@@ -12147,7 +12155,7 @@ void CHARACTER::SetAutoSellStatus(bool bStatus)
 }
 #endif
 
-#if defined(ENABLE_REAL_TIME_REGEN) || defined(STONE_REGEN_FIX)
+#ifdef ENABLE_REAL_TIME_REGEN
 LPREGEN CHARACTER::GetRegen()
 {
 	return m_pkRegen;

@@ -269,6 +269,7 @@ LPCHARACTER CHARACTER_MANAGER::FindPC(const char * name)
 	if (it == m_map_pkPCChr.end())
 		return NULL;
 
+	// <Factor> Added sanity check
 	LPCHARACTER found = it->second;
 	if (found != NULL && strncasecmp(szName, found->GetName(), CHARACTER_NAME_MAX_LEN) != 0)
 	{
@@ -278,7 +279,7 @@ LPCHARACTER CHARACTER_MANAGER::FindPC(const char * name)
 	return found;
 }
 
-LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapIndex)
+LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapIndex, bool is_aggressive)
 {
 	// Allows you to decide why or not to spawn
 	{
@@ -387,6 +388,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 
 	ch->SetProto(pkMob);
 
+	// if mob is npc with no empire assigned, assign to empire of map
 	if (CMobVnumHelper::IsNPCType(pkMob->m_table.bType))
 	{
 		if (ch->GetEmpire() == 0)
@@ -394,6 +396,8 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 	}
 
 	ch->SetRotation(number(0, 360));
+	if (is_aggressive) //@fixme195
+		ch->SetAggressive();
 
 	if (!ch->Show(lMapIndex, x, y, 0, false))
 	{
@@ -406,7 +410,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 	long local_x = x - pkSectreeMap->m_setting.iBaseX;
 	long local_y = y - pkSectreeMap->m_setting.iBaseY;
 	snprintf(buf, sizeof(buf), "spawn %s[%d] random position at %ld %ld %ld %ld (time: %d)", ch->GetName(), dwVnum, x, y, local_x, local_y, get_global_time());
-	
+
 	if (test_server)
 		SendNotice(buf);
 
@@ -446,6 +450,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 
 		if ( is_set )
 		{
+			// SPAWN_BLOCK_LOG
 			static bool s_isLog=quest::CQuestManager::instance().GetEventFlag("spawn_block_log");
 			static DWORD s_nextTime=get_global_time()+10000;
 
@@ -460,7 +465,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 
 			if (s_isLog)
 				sys_log(0, "SpawnMob: BLOCKED position for spawn %s %u at %d %d (attr %u)", pkMob->m_table.szName, dwVnum, x, y, dwAttr);
-
+			// END_OF_SPAWN_BLOCK_LOG
 			return NULL;
 		}
 
@@ -492,6 +497,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 
 	ch->SetProto(pkMob);
 
+	// if mob is npc with no empire assigned, assign to empire of map
 	if (CMobVnumHelper::IsNPCType(pkMob->m_table.bType))
 	{
 		if (ch->GetEmpire() == 0)
@@ -513,95 +519,6 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 
 	return (ch);
 }
-
-#ifdef STONE_REGEN_FIX
-LPCHARACTER CHARACTER_MANAGER::SpawnMobRangeStone(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException, bool bSpawnMotion, bool bAggressive)
-{
-	const CMob* pkMob = CMobManager::instance().Get(dwVnum);
-
-	if (!pkMob)
-		return NULL;
-
-	if (pkMob->m_table.bType == CHAR_TYPE_STONE)
-		bSpawnMotion = false;
-
-	// Ensure sx <= ex and sy <= ey
-	int min_x = (sx < ex) ? sx : ex;
-	int max_x = (sx < ex) ? ex : sx;
-	int min_y = (sy < ey) ? sy : ey;
-	int max_y = (sy < ey) ? ey : sy;
-
-	int i = 3;
-	while (i--)
-	{
-		int x = number(min_x, max_x);
-		int y = number(min_y, max_y);
-
-		LPCHARACTER ch = SpawnMobStone(11, dwVnum, lMapIndex, x, y, 0, bSpawnMotion);
-		if (ch)
-		{
-			return (ch);
-		}
-	}
-
-	return NULL;
-}
-
-LPCHARACTER CHARACTER_MANAGER::SpawnMobStone(DWORD dwType, DWORD dwVnum, long lMapIndex, long x, long y, long z, bool bSpawnMotion, int iRot, bool bShow, bool bAggressive)
-{
-	const CMob* pkMob = CMobManager::instance().Get(dwVnum);
-	if (!pkMob)
-	{
-		sys_err("SpawnMobStone: no mob data for vnum %u (map %u)", dwVnum, lMapIndex);
-		return NULL;
-	}
-
-	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
-	if (!sectree)
-	{
-		sys_log(0, "SpawnMobStone: cannot create monster at non-exist sectree %d x %d (map %d)", x, y, lMapIndex);
-		return NULL;
-	}
-
-	if (!pkMob)
-	{
-		sys_err("SpawnMobStone: no mob data for vnum %u (map %u)", dwVnum, lMapIndex);
-		return NULL;
-	}
-
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().CreateCharacter(pkMob->m_table.szLocaleName, 2);
-	if (!ch)
-	{
-		sys_log(0, "SpawnMobStone: cannot create new character");
-		return NULL;
-	}
-
-	if (iRot == -1)
-		iRot = number(0, 360);
-
-	if (!pkMob)
-	{
-		sys_err("SpawnMobStone: no mob data for vnum %u (map %u)", dwVnum, lMapIndex);
-		return NULL;
-	}
-
-	ch->SetProto(pkMob);
-	if (pkMob->m_table.bType == CHAR_TYPE_NPC)
-		if (ch->GetEmpire() == 0)
-			ch->SetEmpire(SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex));
-
-	ch->SetRotation(iRot);
-
-	if (bShow && !ch->Show(lMapIndex, x, y, z, bSpawnMotion))
-	{
-		M2_DESTROY_CHARACTER(ch);
-		sys_log(0, "SpawnMobStone: cannot show monster");
-		return NULL;
-	}
-
-	return (ch);
-}
-#endif
 
 LPCHARACTER CHARACTER_MANAGER::SpawnMobRange(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException, bool bSpawnMotion, bool bAggressive )
 {
@@ -664,7 +581,7 @@ bool CHARACTER_MANAGER::SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int
 
 	if (!pkGroup)
 	{
-		sys_err("NOT_EXIST_GROUP_VNUM(%u) Map(%u) ", dwVnum, lMapIndex);
+		//sys_err("NOT_EXIST_GROUP_VNUM(%u) Map(%u) ", dwVnum, lMapIndex);
 		return false;
 	}
 
@@ -745,7 +662,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnGroup(DWORD dwVnum, long lMapIndex, int sx, 
 
 	if (!pkGroup)
 	{
-		sys_err("NOT_EXIST_GROUP_VNUM(%u) Map(%u) ", dwVnum, lMapIndex);
+		//sys_err("NOT_EXIST_GROUP_VNUM(%u) Map(%u) ", dwVnum, lMapIndex);
 		return NULL;
 	}
 

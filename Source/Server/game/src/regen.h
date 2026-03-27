@@ -1,4 +1,3 @@
-#include "../../common/service.h"
 #include "dungeon.h"
 
 enum
@@ -8,9 +7,6 @@ enum
 	REGEN_TYPE_EXCEPTION,
 	REGEN_TYPE_GROUP_GROUP,
 	REGEN_TYPE_ANYWHERE,
-#ifdef STONE_REGEN_FIX
-	REGEN_TYPE_STONE,
-#endif
 	REGEN_TYPE_MAX_NUM
 };
 
@@ -107,6 +103,3 @@ extern size_t m_regenId;
 
 extern bool	is_regen_exception(long x, long y);
 extern void	regen_reset(int x, int y);
-#ifdef STONE_REGEN_FIX
-extern void regen_event_create(LPREGEN regen);
-#endif
