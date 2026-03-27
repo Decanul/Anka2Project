@@ -94,13 +94,22 @@ obj/
 *.bak
 Client/syserr/
 Source/Binary/.vs/
-Source/Binary/vs_files/
 
 #############################################
 # SYSTEM FILES
 #############################################
 Thumbs.db
 .DS_Store
+
+#############################################
+# Source/Binary/vs_files: altı tamamen ignore; yalnızca Debug/ ve Release/ takip
+# (genel Debug/ Release kurallarını bu iki yol için geçersiz kılar; blok sonda olmalı)
+#############################################
+Source/Binary/vs_files/**
+!Source/Binary/vs_files/Debug/
+!Source/Binary/vs_files/Debug/**
+!Source/Binary/vs_files/Release/
+!Source/Binary/vs_files/Release/**
 
 #############################################
 # OPTIONAL (isteğe bağlı aç/kapat)
