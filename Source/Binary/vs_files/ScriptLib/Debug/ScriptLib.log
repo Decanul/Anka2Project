@@ -1,0 +1,7 @@
+﻿  StdAfx.cpp
+  PythonDebugModule.cpp
+  PythonLauncher.cpp
+  PythonMarshal.cpp
+  PythonUtils.cpp
+  Resource.cpp
+  ScriptLib.vcxproj -> C:\Anka2Project\Source\Binary\vs_files\ScriptLib\Debug\ScriptLib.lib

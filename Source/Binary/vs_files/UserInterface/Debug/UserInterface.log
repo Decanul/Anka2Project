@@ -1,0 +1,6 @@
+﻿  InstanceBaseEffect.cpp
+  lz4.lib(lz4.obj) : /GL ile derlenmiş MSIL .netmodule veya modül bulundu; bağlantı /LTCG ile yeniden başlatılıyor; bağlayıcı performansını artırmak için bağlantı komut satırına /LTCG ekleyin
+     C:\Anka2Project\Source\Binary\binary\Metin2Debug.lib kitaplığı ve C:\Anka2Project\Source\Binary\binary\Metin2Debug.exp nesnesi oluşturuluyor
+  Kod üretiliyor
+  Kodun üretilmesi tamamlandı
+  UserInterface.vcxproj -> C:\Anka2Project\Source\Binary\binary\Metin2Debug.exe

@@ -1,0 +1,23 @@
+﻿  ActorInstance.cpp
+  ActorInstanceAttach.cpp
+  ActorInstanceBattle.cpp
+  ActorInstanceBlend.cpp
+  ActorInstanceCollisionDetection.cpp
+  ActorInstanceData.cpp
+  ActorInstanceEvent.cpp
+  ActorInstanceFly.cpp
+  ActorInstanceMotion.cpp
+  ActorInstanceMotionEvent.cpp
+  ActorInstancePosition.cpp
+  ActorInstanceRender.cpp
+  ActorInstanceRotation.cpp
+  ActorInstanceSync.cpp
+  ActorInstanceWeaponTrace.cpp
+  Area.cpp
+  FlyingInstance.cpp
+  FlyingObjectManager.cpp
+  GameEventManager.cpp
+  ItemData.cpp
+  ItemManager.cpp
+  MapOutdoorUpdate.cpp
+  GameLib.vcxproj -> C:\Anka2Project\Source\Binary\vs_files\GameLib\Release\GameLib.lib

@@ -1,0 +1,23 @@
+﻿  StdAfx.cpp
+  CPostIt.cpp
+  CRC32.cpp
+  DDSTextureLoader.cpp
+  Debug.cpp
+  error.cpp
+  FileBase.cpp
+  FileDir.cpp
+  FileLoader.cpp
+  lzo.cpp
+  MappedFile.cpp
+  Base.cpp
+  Poly.cpp
+  Symbol.cpp
+  SymTable.cpp
+  Random.cpp
+  Stl.cpp
+  tea.cpp
+  TempFile.cpp
+  Timer.cpp
+  tinyxml2.cpp
+  Utils.cpp
+  EterBase.vcxproj -> C:\Anka2Project\Source\Binary\vs_files\EterBase\Debug\EterBase.lib
