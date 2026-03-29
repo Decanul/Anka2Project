@@ -102,14 +102,13 @@ Thumbs.db
 .DS_Store
 
 #############################################
-# Source/Binary/vs_files: altı tamamen ignore; yalnızca Debug/ ve Release/ takip
-# (genel Debug/ Release kurallarını bu iki yol için geçersiz kılar; blok sonda olmalı)
+# Source/Binary/vs_files: ignore build output (Debug/Release, .obj, .tlog, ...); track only:
+#   *.vcxproj, *.vcxproj.user  (needs !**/ so Git can reach nested paths)
 #############################################
 Source/Binary/vs_files/**
-!Source/Binary/vs_files/Debug/
-!Source/Binary/vs_files/Debug/**
-!Source/Binary/vs_files/Release/
-!Source/Binary/vs_files/Release/**
+!Source/Binary/vs_files/**/
+!Source/Binary/vs_files/**/*.vcxproj
+!Source/Binary/vs_files/**/*.vcxproj.user
 
 #############################################
 # OPTIONAL (isteğe bağlı aç/kapat)
