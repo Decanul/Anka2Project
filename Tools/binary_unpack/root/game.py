@@ -2597,13 +2597,19 @@ class GameWindow(ui.ScriptWindow):
 			"getinputbegin"									: self.GetInputBegin,
 			"getinputend"									: self.GetInputEnd,
 			"getinput"										: self.GetInput,
+		##if app.ENABLE_RENEWAL_TELEPORT_SYSTEM:
+		#	"OpenWarpWindow"								: self.__OpenWarpWindow,
+		##if app.ENABLE_RENEWAL_TELEPORT_SYSTEM:end
 		}
+
+		if app.ENABLE_RENEWAL_TELEPORT_SYSTEM:
+			serverCommandList["OpenWarpWindow"] = self.__OpenWarpWindow
 
 		if app.ENABLE_TITLE_SYSTEM:
 			serverCommandList["TitleSyncReset"] = self.__TitleSystemSyncReset
 			serverCommandList["TitleSyncAdd"] = self.__TitleSystemSyncAdd
 			serverCommandList["TitleSyncActive"] = self.__TitleSystemSyncActive
-            
+
 		if app.ENABLE_COLLECTIONS_SYSTEM:
 			serverCommandList["RECV_Collection"] = self.__RecvCollection
 			serverCommandList["RECV_CollectionItem"] = self.__RecvCollectionItem
@@ -3868,6 +3874,12 @@ class GameWindow(ui.ScriptWindow):
 		def BINARY_OpenWarpWindow(self):
 			if self.interface:
 				self.interface.OpenWarpWindow()
+
+	if app.ENABLE_RENEWAL_TELEPORT_SYSTEM:
+		def __OpenWarpWindow(self):
+			if app.ENABLE_RENEWAL_TELEPORT_SYSTEM:
+				if self.interface:
+					self.interface.OpenWarpWindow()
 
 	if app.ENABLE_RESP_SYSTEM:
 		def BINARY_OpenRespWindow(self):

@@ -214,6 +214,9 @@ class RespDialog(ui.ScriptWindow):
         self.badgeLevelValue = self.GetChild("badge_level_value")
         self.badgeAffectValue = self.GetChild("badge_affect_value")
 
+        # UI script may omit these; keep None unless uncommented with matching uiscript children.
+        self.headerMobCheckbox = None
+        self.headerRespCheckbox = None
         #self.headerMobCheckbox = self.GetChild("header_mob_checkbox")
         #self.headerRespCheckbox = self.GetChild("header_resp_checkbox")
 
@@ -580,14 +583,16 @@ class RespDialog(ui.ScriptWindow):
             self.__wndRenderTargetWnd.Close()
 
     def OnOverInTeleportButton(self, index):
-        if self.headerRespCheckbox.IsChecked():
-            resp_data = self.__respDataDict.get(self.__mobVnum, None)
-            if not resp_data:
-                return
+        # If checkbox exists and is off, skip map; if UI has no checkbox, always show map on hover.
+        if self.headerRespCheckbox is not None and not self.headerRespCheckbox.IsChecked():
+            return
+        resp_data = self.__respDataDict.get(self.__mobVnum, None)
+        if not resp_data:
+            return
 
-            data = resp_data[self.__LocalSlotToGlobal(index)]
+        data = resp_data[self.__LocalSlotToGlobal(index)]
 
-            self.__wndRenderMapWnd.Open(*data["cord"])
+        self.__wndRenderMapWnd.Open(*data["cord"])
 
     def OnOverOutTeleportButton(self):
         if self.__wndRenderMapWnd:
@@ -892,11 +897,18 @@ class RenderTargetDialog(ui.ScriptWindow):
             # Reset and configure render target
             renderTarget.ResetModel(self.renderTargetNumber)
             renderTarget.SelectModel(self.renderTargetNumber, mobVnum)
-            
-            # Set camera position for mob preview
-            renderTarget.SetModelV3Eye(self.renderTargetNumber, 0.0, -800.0, 400.0)
-            renderTarget.SetModelV3Target(self.renderTargetNumber, 0.0, 0.0, 50.0)
-            renderTarget.SetScale(self.renderTargetNumber, 0.3)
+            # SetScale calls SelectModel internally and resets eye/target; must run before SetModelV3*
+            renderTarget.SetScale(self.renderTargetNumber, 0.03)
+            tx, ty, tz = 0.0, 0.0, 82.0
+            bx, by, bz = 0.0, -1725.0, 750.0
+            r = 1.25
+            dv = 1.25
+            ez0 = (bz - tz) * r + tz
+            tz2 = tz * dv
+            ez2 = tz2 + (ez0 - tz) * dv
+            renderTarget.SetModelV3Target(self.renderTargetNumber, tx, ty, tz2)
+            renderTarget.SetModelV3Eye(self.renderTargetNumber,
+                (bx - tx) * r + tx, (by - ty) * r + ty, ez2)
             
             self.headerText.SetText(
                 "%s  (Lv. %d)" % (nonplayer.GetMonsterName(mobVnum), nonplayer.GetMonsterLevel(mobVnum)))

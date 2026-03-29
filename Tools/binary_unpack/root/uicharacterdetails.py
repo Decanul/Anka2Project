@@ -10,134 +10,92 @@ from uiToolTip import ItemToolTip
 
 IMG_DIR = "characterdetails/"
 
-def _POINT(name):
-	return getattr(player, name, None)
-
-def _GetStatusByApply(applyType, fallbackPointType):
-	# Apply -> Point eÃ…Å¸lemesini mÃƒÂ¼mkÃƒÂ¼nse client'tan otomatik ÃƒÂ§ek.
-	# Hardcoded player.POINT_* sabitleri bazÃ„Â± derlemelerde uyuÃ…Å¸mayÃ„Â±p 0 gÃƒÂ¶sterebiliyor.
+# Ikinci deger player.GetStatus icin POINT indeksidir (APPLY degil).
+# Elle yazilan sabitler kolayca kayiyor; item.GetApplyPoint client C++ ile ayni eslemeyi kullanir.
+def _Ap(applyType):
 	if hasattr(item, "GetApplyPoint"):
-		try:
-			pt = item.GetApplyPoint(applyType)
-			if pt:
-				return player.GetStatus(pt)
-		except:
-			pass
-	if fallbackPointType is None:
-		return None
-	return player.GetStatus(fallbackPointType)
-
-def _GetEquippedApplySum(applyType):
-	# Efsun/bonus deÄŸerini "toplam status"tan deÄŸil, sadece takÄ±lÄ± itemlerin attribute'larÄ±ndan topla.
-	# BÃ¶ylece Ã¼stte item yokken saldÄ±rÄ±/savunma gibi deÄŸerler 0 gÃ¶rÃ¼nÃ¼r.
-	slots = []
-	for name in (
-		"EQUIPMENT_BODY", "EQUIPMENT_HEAD", "EQUIPMENT_SHOES", "EQUIPMENT_WRIST",
-		"EQUIPMENT_WEAPON", "EQUIPMENT_NECK", "EQUIPMENT_EAR", "EQUIPMENT_SHIELD",
-		"EQUIPMENT_UNIQUE1", "EQUIPMENT_UNIQUE2", "EQUIPMENT_ARROW",
-		"EQUIPMENT_RING1", "EQUIPMENT_RING2", "EQUIPMENT_BELT",
-		"EQUIPMENT_PENDANT", "EQUIPMENT_MOUNT", "EQUIPMENT_PET", "EQUIPMENT_PASSIVE",
-		"COSTUME_SLOT_BODY", "COSTUME_SLOT_HAIR", "COSTUME_SLOT_ACCE", "COSTUME_SLOT_WEAPON",
-		"COSTUME_SLOT_AURA",
-	):
-		v = getattr(item, name, None)
-		if v is not None:
-			slots.append(v)
-
-	total = 0
-	# GameType.h: ITEM_ATTRIBUTE_SLOT_MAX_NUM (genelde 7)
-	for cell in slots:
-		for attrIdx in xrange(7):
-			try:
-				byType, sValue = player.GetItemAttribute(cell, attrIdx)
-			except:
-				continue
-			if byType == applyType:
-				total += sValue
-
-	return total
+		return [applyType, item.GetApplyPoint(applyType)]
+	return [applyType, 0]
 
 bonus_list = [
 	["PvM",
 		[
-			[item.APPLY_ATTBONUS_MONSTER, _POINT("POINT_ATTBONUS_MONSTER")],
-			[item.APPLY_ATTBONUS_STONE, _POINT("ATTBONUS_STONE")],
-			[item.APPLY_ATTBONUS_BOSS, _POINT("ATTBONUS_BOSS")],
-			[item.APPLY_NORMAL_HIT_DAMAGE_BONUS, _POINT("POINT_NORMAL_HIT_DAMAGE_BONUS")],
-#ifdef ENABLE_AVG_PVM
-			[item.APPLY_ATTBONUS_MEDI_PVM, _POINT("POINT_ATTBONUS_MEDI_PVM")],
-#endif
-			[item.APPLY_ATTBONUS_PVM_STR, _POINT("POINT_ATTBONUS_PVM_STR")],
-			[item.APPLY_ATTBONUS_PVM_BERSERKER, _POINT("POINT_ATTBONUS_PVM_BERSERKER")],
-			[item.APPLY_ATTBONUS_ELEMENTS, _POINT("ATTBONUS_ELEMENTS")],
-			[item.APPLY_ATTBONUS_UNDEAD, _POINT("POINT_ATTBONUS_UNDEAD")],
-			[item.APPLY_ATTBONUS_DEVIL, _POINT("POINT_ATTBONUS_DEVIL")],
-			[item.APPLY_ATTBONUS_ORC, _POINT("POINT_ATTBONUS_ORC")],
-			[item.APPLY_ATTBONUS_ANIMAL, _POINT("POINT_ATTBONUS_ANIMAL")],
-			[item.APPLY_ATTBONUS_MILGYO, _POINT("POINT_ATTBONUS_MILGYO")],
-			[item.APPLY_STEAL_HP, _POINT("POINT_STEAL_HP")],
-			[item.APPLY_HP_REGEN, _POINT("POINT_HP_REGEN")],
-			[item.APPLY_EXP_DOUBLE_BONUS, _POINT("POINT_EXP_DOUBLE_BONUS")],
-			[item.APPLY_GOLD_DOUBLE_BONUS, _POINT("POINT_GOLD_DOUBLE_BONUS")],
-			[item.APPLY_ITEM_DROP_BONUS, _POINT("POINT_ITEM_DROP_BONUS")],
-			[item.APPLY_MALL_EXPBONUS, _POINT("POINT_MALL_EXPBONUS")],
-			[item.APPLY_MALL_ITEMBONUS, _POINT("POINT_MALL_ITEMBONUS")],
-			[item.APPLY_MALL_GOLDBONUS, _POINT("POINT_MALL_GOLDBONUS")],
+			_Ap(item.APPLY_ATTBONUS_MONSTER),
+			_Ap(item.APPLY_ATTBONUS_STONE),
+			_Ap(item.APPLY_ATTBONUS_BOSS),
+			_Ap(item.APPLY_NORMAL_HIT_DAMAGE_BONUS),
+			_Ap(item.APPLY_ATTBONUS_MEDI_PVM),
+			_Ap(item.APPLY_ATTBONUS_PVM_STR),
+			_Ap(item.APPLY_ATTBONUS_PVM_BERSERKER),
+			_Ap(item.APPLY_ATTBONUS_ELEMENTS),
+			_Ap(item.APPLY_ATTBONUS_UNDEAD),
+			_Ap(item.APPLY_ATTBONUS_DEVIL),
+			_Ap(item.APPLY_ATTBONUS_ORC),
+			_Ap(item.APPLY_ATTBONUS_ANIMAL),
+			_Ap(item.APPLY_ATTBONUS_MILGYO),
+			_Ap(item.APPLY_STEAL_HP),
+			_Ap(item.APPLY_HP_REGEN),
+			_Ap(item.APPLY_EXP_DOUBLE_BONUS),
+			_Ap(item.APPLY_GOLD_DOUBLE_BONUS),
+			_Ap(item.APPLY_ITEM_DROP_BONUS),
+			_Ap(item.APPLY_MALL_EXPBONUS),
+			_Ap(item.APPLY_MALL_ITEMBONUS),
+			_Ap(item.APPLY_MALL_GOLDBONUS),
 		]
 	],
 	["PvP",
 		[
-			[item.APPLY_ATTBONUS_HUMAN, _POINT("POINT_ATTBONUS_HUMAN")],
-			[item.APPLY_ATTBONUS_CHARACTERS, _POINT("ATTBONUS_CHARACTERS")],
-			[item.APPLY_ATTBONUS_WARRIOR, _POINT("POINT_ATTBONUS_WARRIOR")],
-			[item.APPLY_ATTBONUS_ASSASSIN, _POINT("POINT_ATTBONUS_ASSASSIN")],
-			[item.APPLY_ATTBONUS_SURA, _POINT("POINT_ATTBONUS_SURA")],
-			[item.APPLY_ATTBONUS_SHAMAN, _POINT("POINT_ATTBONUS_SHAMAN")],
-			[item.APPLY_RESIST_WARRIOR, _POINT("POINT_RESIST_WARRIOR")],
-			[item.APPLY_RESIST_ASSASSIN, _POINT("POINT_RESIST_ASSASSIN")],
-			[item.APPLY_RESIST_SURA, _POINT("POINT_RESIST_SURA")],
-			[item.APPLY_RESIST_SHAMAN, _POINT("POINT_RESIST_SHAMAN")],
-			[item.APPLY_RESIST_HUMAN, _POINT("POINT_RESIST_HUMAN")],
-			[item.APPLY_RESIST_SWORD, _POINT("POINT_RESIST_SWORD")],
-			[item.APPLY_RESIST_TWOHAND, _POINT("POINT_RESIST_TWOHAND")],
-			[item.APPLY_RESIST_DAGGER, _POINT("POINT_RESIST_DAGGER")],
-			[item.APPLY_RESIST_BELL, _POINT("POINT_RESIST_BELL")],
-			[item.APPLY_RESIST_FAN, _POINT("POINT_RESIST_FAN")],
-			[item.APPLY_RESIST_BOW, _POINT("POINT_RESIST_BOW")],
-			[item.APPLY_RESIST_MAGIC, _POINT("RESIST_MAGIC")],
+			_Ap(item.APPLY_ATTBONUS_HUMAN),
+			_Ap(item.APPLY_ATTBONUS_CHARACTERS),
+			_Ap(item.APPLY_ATTBONUS_WARRIOR),
+			_Ap(item.APPLY_ATTBONUS_ASSASSIN),
+			_Ap(item.APPLY_ATTBONUS_SURA),
+			_Ap(item.APPLY_ATTBONUS_SHAMAN),
+			_Ap(item.APPLY_RESIST_WARRIOR),
+			_Ap(item.APPLY_RESIST_ASSASSIN),
+			_Ap(item.APPLY_RESIST_SURA),
+			_Ap(item.APPLY_RESIST_SHAMAN),
+			_Ap(item.APPLY_RESIST_HUMAN),
+			_Ap(item.APPLY_RESIST_SWORD),
+			_Ap(item.APPLY_RESIST_TWOHAND),
+			_Ap(item.APPLY_RESIST_DAGGER),
+			_Ap(item.APPLY_RESIST_BELL),
+			_Ap(item.APPLY_RESIST_FAN),
+			_Ap(item.APPLY_RESIST_BOW),
+			_Ap(item.APPLY_RESIST_MAGIC),
 		]
 	],
 	[localeInfo.SALDIRI_BONUSLARI,
 		[
-			[item.APPLY_SKILL_DAMAGE_BONUS, _POINT("POINT_SKILL_DAMAGE_BONUS")],
-			[item.APPLY_NORMAL_HIT_DAMAGE_BONUS, _POINT("POINT_NORMAL_HIT_DAMAGE_BONUS")],
-			[item.APPLY_ATT_GRADE_BONUS, _POINT("POINT_ATT_GRADE_BONUS")],
-			[item.APPLY_MALL_ATTBONUS, _POINT("POINT_MALL_ATTBONUS")],
-			[item.APPLY_CRITICAL_PCT, _POINT("POINT_CRITICAL_PCT")],
-			[item.APPLY_PENETRATE_PCT, _POINT("POINT_PENETRATE_PCT")],
-			[item.APPLY_POISON_PCT, _POINT("POINT_POISON_PCT")],
-			[item.APPLY_SLOW_PCT, _POINT("POINT_SLOW_PCT")],
-			[item.APPLY_STUN_PCT, _POINT("POINT_STUN_PCT")],
-			[item.APPLY_CAST_SPEED, _POINT("POINT_CASTING_SPEED")],
-			[item.APPLY_MALL_DEFBONUS, _POINT("POINT_MALL_DEFBONUS")],
+			_Ap(item.APPLY_SKILL_DAMAGE_BONUS),
+			_Ap(item.APPLY_NORMAL_HIT_DAMAGE_BONUS),
+			_Ap(item.APPLY_ATT_GRADE_BONUS),
+			_Ap(item.APPLY_MALL_ATTBONUS),
+			_Ap(item.APPLY_CRITICAL_PCT),
+			_Ap(item.APPLY_PENETRATE_PCT),
+			_Ap(item.APPLY_POISON_PCT),
+			_Ap(item.APPLY_SLOW_PCT),
+			_Ap(item.APPLY_STUN_PCT),
+			_Ap(item.APPLY_CAST_SPEED),
+			_Ap(item.APPLY_MALL_DEFBONUS),
 		]
 	],
 	[localeInfo.SAVUNMA_BONUSLARI,
 		[
-			[item.APPLY_RESIST_MONSTER, _POINT("RESIST_MONSTER")],
-			[item.APPLY_ENCHANT_ELEMENTS, _POINT("ENCHANT_ELEMENTS")],
-			[item.APPLY_ENCHANT_CHARACTERS, _POINT("ENCHANT_CHARACTERS")],
-			[item.APPLY_SKILL_DEFEND_BONUS, _POINT("POINT_SKILL_DEFEND_BONUS")],
-			[item.APPLY_NORMAL_HIT_DEFEND_BONUS, _POINT("POINT_NORMAL_HIT_DEFEND_BONUS")],
-			[item.APPLY_ANTI_CRITICAL_PCT, _POINT("POINT_RESIST_CRITICAL")],
-			[item.APPLY_ANTI_PENETRATE_PCT, _POINT("POINT_RESIST_PENETRATE")],
-			[item.APPLY_BLOCK, _POINT("POINT_BLOCK")],
-			[item.APPLY_REFLECT_MELEE, _POINT("POINT_REFLECT_MELEE")],
-			[item.APPLY_DODGE, _POINT("POINT_DODGE")],
-			[item.APPLY_POISON_REDUCE, _POINT("POINT_POISON_REDUCE")],
-			[item.APPLY_RESIST_FIRE, _POINT("POINT_RESIST_FIRE")],
-			[item.APPLY_RESIST_ELEC, _POINT("POINT_RESIST_ELEC")],
-			[item.APPLY_RESIST_WIND, _POINT("POINT_RESIST_WIND")],
+			_Ap(item.APPLY_RESIST_MONSTER),
+			_Ap(item.APPLY_ENCHANT_ELEMENTS),
+			_Ap(item.APPLY_ENCHANT_CHARACTERS),
+			_Ap(item.APPLY_SKILL_DEFEND_BONUS),
+			_Ap(item.APPLY_NORMAL_HIT_DEFEND_BONUS),
+			_Ap(item.APPLY_ANTI_CRITICAL_PCT),
+			_Ap(item.APPLY_ANTI_PENETRATE_PCT),
+			_Ap(item.APPLY_BLOCK),
+			_Ap(item.APPLY_REFLECT_MELEE),
+			_Ap(item.APPLY_DODGE),
+			_Ap(item.APPLY_POISON_REDUCE),
+			_Ap(item.APPLY_RESIST_FIRE),
+			_Ap(item.APPLY_RESIST_ELEC),
+			_Ap(item.APPLY_RESIST_WIND),
 		]
 	],
 ]
@@ -452,13 +410,9 @@ class CharacterDetailsUI(ui.ScriptWindow):
 						for j in xrange(len(bonus_data)):
 							text = elementList["%d_%d_name"%(i,j)].GetText().lower()
 							if text.find(searchText) != -1:
-								if bonus_data[j][1] is None:
-									elementList["%d_%d_image"%(i,j)].Hide()
-									continue
 								elementList["%d_%d_image"%(i,j)].Show()
 								elementList["%d_%d_image"%(i,j)].SetPosition(BONUS_X, Y_POS - basePos)
-								val = _GetEquippedApplySum(bonus_data[j][0])
-								elementList["%d_%d_value"%(i,j)].SetText(str(max(0, val)))
+								elementList["%d_%d_value"%(i,j)].SetText(str(player.GetStatus(bonus_data[j][1])))
 								Y_POS += CATEGORY_Y_FIRST_BONUS_RANGE
 								images.append(elementList["%d_%d_image"%(i,j)])
 								textLines.append(elementList["%d_%d_name"%(i,j)])
@@ -483,13 +437,9 @@ class CharacterDetailsUI(ui.ScriptWindow):
 						else:
 							Y_POS += CATEGORY_Y_FIRST_BONUS_RANGE
 							for j in xrange(len(bonus_data)):
-								if bonus_data[j][1] is None:
-									elementList["%d_%d_image"%(i,j)].Hide()
-									continue
 								elementList["%d_%d_image"%(i,j)].Show()
 								elementList["%d_%d_image"%(i,j)].SetPosition(BONUS_X, Y_POS - basePos)
-								val = _GetEquippedApplySum(bonus_data[j][0])
-								elementList["%d_%d_value"%(i,j)].SetText(str(max(0, val)))
+								elementList["%d_%d_value"%(i,j)].SetText(str(player.GetStatus(bonus_data[j][1])))
 								Y_POS += CATEGORY_Y_FIRST_BONUS_RANGE
 
 								images.append(elementList["%d_%d_image"%(i,j)])
