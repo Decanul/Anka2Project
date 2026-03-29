@@ -244,11 +244,17 @@ bool CSafebox::MoveItem(BYTE bCell, BYTE bDestCell, BYTE count)
 			count = MIN(200 - item2->GetCount(), count);
 #endif
 
-			if (item->GetCount() >= count)
-				Remove(bCell);
-
-			item->SetCount(item->GetCount() - count);
 			item2->SetCount(item2->GetCount() + count);
+
+			if (item->GetCount() <= count)
+			{
+				Remove(bCell);
+				M2_DESTROY_ITEM(item);
+			}
+			else
+			{
+				item->SetCount(item->GetCount() - count);
+			}
 
 			sys_log(1, "SAFEBOX: STACK %s %d -> %d %s count %d", m_pkChrOwner->GetName(), bCell, bDestCell, item2->GetName(), item2->GetCount());
 			return true;

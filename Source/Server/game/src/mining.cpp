@@ -128,7 +128,7 @@ namespace mining
 			return;
 		}
 
-		LPITEM item = ITEM_MANAGER::instance().CreateItem(dwRawOreVnum, GetFractionCount());
+		LPITEM item = ITEM_MANAGER::instance().CreateItem(dwRawOreVnum, iFractionCount);
 
 		if (!item)
 		{

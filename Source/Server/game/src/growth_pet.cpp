@@ -74,7 +74,7 @@ struct FuncGyeonggongBoom
 				if (pVictim == m_pAttacker)
 					return;
 
-				if (battle_is_attackable(m_pAttacker, pVictim))
+				if (!battle_is_attackable(m_pAttacker, pVictim))
 					return;
 
 				pVictim->Damage(m_pAttacker, m_wDamage, DAMAGE_TYPE_SPECIAL);
