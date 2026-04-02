@@ -111,6 +111,11 @@ Source/Binary/vs_files/**
 !Source/Binary/vs_files/**/*.vcxproj.user
 
 #############################################
+# Client pack (kapalı FoxFS pack dosyaları — repoda tutulmaz)
+#############################################
+Client/pack/**
+
+#############################################
 # OPTIONAL (isteğe bağlı aç/kapat)
 #############################################
 # Client büyük assetleri LFS ile kullanıyorsan burayı açma
