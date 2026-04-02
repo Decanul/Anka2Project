@@ -111,9 +111,10 @@ Source/Binary/vs_files/**
 !Source/Binary/vs_files/**/*.vcxproj.user
 
 #############################################
-# Client pack (kapalı FoxFS pack dosyaları — repoda tutulmaz)
+# Client pack (kapalı FoxFS pack dosyaları — repoda tutulmaz; klasör .gitkeep ile kalır)
 #############################################
 Client/pack/**
+!Client/pack/.gitkeep
 
 #############################################
 # OPTIONAL (isteğe bağlı aç/kapat)
