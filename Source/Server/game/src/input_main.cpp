@@ -110,16 +110,16 @@ void CInputMain::TargetInfoLoad(LPCHARACTER ch, const char* c_pData)
 	if (!ch || !m_pkChrTarget)
 		return;
 
-	// Gerçek oyuncu kontrolü
+	// Gerï¿½ek oyuncu kontrolï¿½
 	if (!ch->IsPC())
 		return;
 
-	// Oyuncularý hariç tut (sadece yaratýklar ve taþlar için çalýþýr)
+	// Oyuncularï¿½ hariï¿½ tut (sadece yaratï¿½klar ve taï¿½lar iï¿½in ï¿½alï¿½ï¿½ï¿½r)
 	if (m_pkChrTarget->IsPC())
 		return;
 
 #ifdef ENABLE_BOT_PLAYER
-    // Bot karakterleri tamamen hariç tut
+    // Bot karakterleri tamamen hariï¿½ tut
     if (ch->IsBotCharacter() || m_pkChrTarget->IsBotCharacter())
         return;
 #endif
@@ -157,7 +157,7 @@ void SendBlockChatInfo(LPCHARACTER ch, int sec)
 	else if (hour > 0 && min == 0)
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 166, "%d#%d", hour, sec);
 	else if (hour == 0 && min > 0)
-		ch->LocaleChatPacket(CHAT_TYPE_INFO, 167, "%d#%d", hour, sec);
+		ch->LocaleChatPacket(CHAT_TYPE_INFO, 167, "%d#%d", min, sec);
 	else
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 168, "%d", sec);
 }
@@ -343,7 +343,6 @@ void GetTextTagInfo(const char * src, int src_len, int & hyperlinks, bool & colo
 
 int ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 {
-	return 0;
 	int hyperlinks;
 	bool colored;
 #ifdef ENABLE_EMOTICONS_SYSTEM
@@ -539,13 +538,13 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 	else
 	{
 #ifdef ENABLE_BOT_PLAYER
-		// Bot karakter kontrolü - eðer hedef bir bot ise, "xxx fýsýldamayý blokladý" mesajýný whisper paketi ile gönder
+		// Bot karakter kontrolï¿½ - eï¿½er hedef bir bot ise, "xxx fï¿½sï¿½ldamayï¿½ blokladï¿½" mesajï¿½nï¿½ whisper paketi ile gï¿½nder
 		if (pkChr && (pkChr->IsBotCharacter() || CBotCharacterManager::instance().IsBotCharacter(pinfo->szNameTo)))
 		{
 			if (ch->GetDesc())
 			{
 				char blockedMsg[CHAT_MAX_LEN + 1];
-				snprintf(blockedMsg, sizeof(blockedMsg), "%s fýsýldamayý blokladý.", pinfo->szNameTo);
+				snprintf(blockedMsg, sizeof(blockedMsg), "%s fï¿½sï¿½ldamayï¿½ blokladï¿½.", pinfo->szNameTo);
 				
 				TPacketGCWhisper pack;
 				pack.bHeader = HEADER_GC_WHISPER;
@@ -1171,13 +1170,13 @@ int CInputMain::ItemsPickup(LPCHARACTER ch, const char * c_pData, size_t uiBytes
 {
 	TPacketCGItemsPickUp * p = (TPacketCGItemsPickUp *)c_pData;
 	
-	// Integer overflow kontrolü: count deðerini kontrol et
+	// Integer overflow kontrolï¿½: count deï¿½erini kontrol et
 	if (p->count == 0 || p->count > 1000)
 		return -1;
 	
 	const int iExtraLen = p->count * sizeof(DWORD);
 
-	// Integer overflow kontrolü: iExtraLen negatif veya çok büyük olamaz
+	// Integer overflow kontrolï¿½: iExtraLen negatif veya ï¿½ok bï¿½yï¿½k olamaz
 	if (iExtraLen < 0 || iExtraLen > (int)uiBytes)
 		return -1;
 
@@ -2263,7 +2262,7 @@ void CInputMain::SetSkillColor(LPCHARACTER ch, const char* pcData)
 
 	TPacketCGSkillColor* CGPacket = (TPacketCGSkillColor*)pcData;
 
-	// Array bounds kontrolü: bSkillSlot deðeri geçerli aralýkta olmalý
+	// Array bounds kontrolï¿½: bSkillSlot deï¿½eri geï¿½erli aralï¿½kta olmalï¿½
 	// Array boyutu: MAX_SKILL_COUNT + MAX_BUFF_COUNT
 	if (CGPacket->bSkillSlot >= (ESkillColorLength::MAX_SKILL_COUNT + ESkillColorLength::MAX_BUFF_COUNT))
 		return;
@@ -2277,10 +2276,10 @@ void CInputMain::SetSkillColor(LPCHARACTER ch, const char* pcData)
 	DWORD dwData[ESkillColorLength::MAX_SKILL_COUNT + ESkillColorLength::MAX_BUFF_COUNT][ESkillColorLength::MAX_EFFECT_COUNT];
 	memcpy(dwData, ch->GetSkillColor(), sizeof(dwData));
 
-	// Array bounds kontrolü ile güvenli eriþim (zaten yukarýda kontrol edildi ama ekstra güvenlik için)
+	// Array bounds kontrolï¿½ ile gï¿½venli eriï¿½im (zaten yukarï¿½da kontrol edildi ama ekstra gï¿½venlik iï¿½in)
 	if (CGPacket->bSkillSlot < (ESkillColorLength::MAX_SKILL_COUNT + ESkillColorLength::MAX_BUFF_COUNT))
 	{
-		// Ýkinci boyut kontrolü: MAX_EFFECT_COUNT kontrolü (5 deðer yazýlýyor, index 0-4)
+		// ï¿½kinci boyut kontrolï¿½: MAX_EFFECT_COUNT kontrolï¿½ (5 deï¿½er yazï¿½lï¿½yor, index 0-4)
 		if (ESkillColorLength::MAX_EFFECT_COUNT >= 5)
 		{
 			dwData[CGPacket->bSkillSlot][0] = CGPacket->dwCol1;
@@ -2731,7 +2730,7 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 	if (!pkSafebox || !pkItem)
 		return;
 
-	// Güvenlik: SwitchBot'tan depoya transfer engeli (Item Duplication önleme)
+	// Gï¿½venlik: SwitchBot'tan depoya transfer engeli (Item Duplication ï¿½nleme)
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	if (p->ItemPos.IsSwitchbotPosition())
 	{
@@ -2857,7 +2856,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 	if (!ch->IsEmptyItemGrid(p->ItemPos, pkItem->GetSize()))
 		return;
 
-	// Güvenlik: Depodan SwitchBot'a transfer engeli (Item Duplication önleme)
+	// Gï¿½venlik: Depodan SwitchBot'a transfer engeli (Item Duplication ï¿½nleme)
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	if (p->ItemPos.IsSwitchbotPosition())
 	{
@@ -3449,7 +3448,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 #ifdef ENABLE_GUILD_YANG_ACCOUNTING_FIX
 				if(ch->GetGold()+gold/**/ >= /**/ GOLD_MAX)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, "Yang miktarýn maksimum seviyeye ulaþmýþ.");
+					ch->ChatPacket(CHAT_TYPE_INFO, "Yang miktarï¿½n maksimum seviyeye ulaï¿½mï¿½ï¿½.");
 					return SubPacketLen;
 				}
 #endif
@@ -3486,7 +3485,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 #endif
 
 #ifdef ENABLE_BOT_PLAYER
-				// Bot karakter kontrolü - eðer hedef bir bot ise, lonca daveti engelleme mesajýný gönder
+				// Bot karakter kontrolï¿½ - eï¿½er hedef bir bot ise, lonca daveti engelleme mesajï¿½nï¿½ gï¿½nder
 				if (newmember && newmember->IsBotCharacter())
 				{
 					ch->LocaleChatPacket(CHAT_TYPE_INFO, 391, "");
@@ -3945,7 +3944,7 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 				}
 				else
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, "Yýlan Tapýnaðý Demircisi'nden ödülü yalnýzca her 24 saatte bir alabilirsin.");
+					ch->ChatPacket(CHAT_TYPE_INFO, "Yï¿½lan Tapï¿½naï¿½ï¿½ Demircisi'nden ï¿½dï¿½lï¿½ yalnï¿½zca her 24 saatte bir alabilirsin.");
 				}
 			}
 			else

@@ -398,24 +398,30 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 			if (bCount > 0)
 				item->AddToCharacter(ch, TItemPos(INVENTORY, iEmptyPos));
 			else
+			{
 				M2_DESTROY_ITEM(item);
+				item = NULL;
+			}
 		}
 
-		ITEM_MANAGER::instance().FlushDelayedSave(item);
+		if (item)
+		{
+			ITEM_MANAGER::instance().FlushDelayedSave(item);
 
 #ifdef ENABLE_GOLD_LIMIT
-		snprintf(buf, sizeof(buf), "%s %u(%s) %lld %u", item->GetName(), m_pkPC->GetPlayerID(), m_pkPC->GetName(), dwPrice, item->GetCount());
+			snprintf(buf, sizeof(buf), "%s %u(%s) %lld %u", item->GetName(), m_pkPC->GetPlayerID(), m_pkPC->GetName(), dwPrice, item->GetCount());
 #else
-		snprintf(buf, sizeof(buf), "%s %u(%s) %u %u", item->GetName(), m_pkPC->GetPlayerID(), m_pkPC->GetName(), dwPrice, item->GetCount());
+			snprintf(buf, sizeof(buf), "%s %u(%s) %u %u", item->GetName(), m_pkPC->GetPlayerID(), m_pkPC->GetName(), dwPrice, item->GetCount());
 #endif
-		LogManager::instance().ItemLog(ch, item, "SHOP_BUY", buf);
+			LogManager::instance().ItemLog(ch, item, "SHOP_BUY", buf);
 
 #ifdef ENABLE_GOLD_LIMIT
-		snprintf(buf, sizeof(buf), "%s %u(%s) %lld %u", item->GetName(), ch->GetPlayerID(), ch->GetName(), dwPrice, item->GetCount());
+			snprintf(buf, sizeof(buf), "%s %u(%s) %lld %u", item->GetName(), ch->GetPlayerID(), ch->GetName(), dwPrice, item->GetCount());
 #else
-		snprintf(buf, sizeof(buf), "%s %u(%s) %u %u", item->GetName(), ch->GetPlayerID(), ch->GetName(), dwPrice, item->GetCount());
+			snprintf(buf, sizeof(buf), "%s %u(%s) %u %u", item->GetName(), ch->GetPlayerID(), ch->GetName(), dwPrice, item->GetCount());
 #endif
-		LogManager::instance().ItemLog(m_pkPC, item, "SHOP_SELL", buf);
+			LogManager::instance().ItemLog(m_pkPC, item, "SHOP_SELL", buf);
+		}
 
 		r_item.pkItem = NULL;
 		BroadcastUpdateItem(pos);
@@ -477,11 +483,17 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 			if (bCount > 0)
 				item->AddToCharacter(ch, TItemPos(INVENTORY, iEmptyPos));
 			else
+			{
 				M2_DESTROY_ITEM(item);
+				item = NULL;
+			}
 		}
 
-		ITEM_MANAGER::instance().FlushDelayedSave(item);
-		LogManager::instance().ItemLog(ch, item, "BUY", item->GetName());
+		if (item)
+		{
+			ITEM_MANAGER::instance().FlushDelayedSave(item);
+			LogManager::instance().ItemLog(ch, item, "BUY", item->GetName());
+		}
 
 		if (item->GetVnum() >= 80003 && item->GetVnum() <= 80007)
 		{

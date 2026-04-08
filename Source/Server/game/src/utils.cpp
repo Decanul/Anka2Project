@@ -43,7 +43,7 @@ bool getInjectText(const char* data)
 
 	for (size_t j = 0; j < (sizeof(words) / sizeof(words[0])); ++j)
 	{
-		if (text.find(words[j]) != -1)
+		if (text.find(words[j]) != std::string::npos)
 			return true;
 	}
 	return false;

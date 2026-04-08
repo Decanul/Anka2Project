@@ -198,6 +198,7 @@ if app.ENABLE_RENEWAL_SERVER_LIST:
 				if self.stateDict.get(self.showLineCount) != None:
 					w, h = textLine.GetTextSize()
 
+					flagWidth = 0
 					if self.serverFlagDict.get(self.showLineCount) != None:
 						flagWidth = self.serverFlagDict[self.showLineCount].GetWidth()
 

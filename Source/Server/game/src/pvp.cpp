@@ -61,7 +61,7 @@ void CPVP::Packet(bool bDelete)
 	if (!m_players[0].dwVID || !m_players[1].dwVID)
 	{
 		if (bDelete)
-			sys_err("null vid when removing %u %u", m_players[0].dwVID, m_players[0].dwVID);
+			sys_err("null vid when removing %u %u", m_players[0].dwVID, m_players[1].dwVID);
 
 		return;
 	}
@@ -364,22 +364,22 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 		return false;
 
 #ifdef ENABLE_BOT_PLAYER
-	// Bot karakterler için saldýrý kontrolü
+	// Bot karakterler iï¿½in saldï¿½rï¿½ kontrolï¿½
 	if (pkChr->IsBotCharacter())
 	{
-		// Bot'lar metin taþlarýna her zaman saldýrabilir
+		// Bot'lar metin taï¿½larï¿½na her zaman saldï¿½rabilir
 		if (pkVictim->IsStone())
 			return true;
 		
-		// Bot'lar düþman imparatorluk botlarýna saldýrabilir
+		// Bot'lar dï¿½ï¿½man imparatorluk botlarï¿½na saldï¿½rabilir
 		if (pkVictim->IsBotCharacter() && pkChr->GetEmpire() != pkVictim->GetEmpire())
 			return true;
 		
-		// Bot'lar düþman imparatorluk oyuncularýna saldýrabilir
+		// Bot'lar dï¿½ï¿½man imparatorluk oyuncularï¿½na saldï¿½rabilir
 		if (pkVictim->IsPC() && !pkVictim->IsBotCharacter() && pkChr->GetEmpire() != pkVictim->GetEmpire())
 			return true;
 		
-		// Bot'lar normal moblara saldýrabilir
+		// Bot'lar normal moblara saldï¿½rabilir
 		if (pkVictim->IsMonster())
 			return true;
 	}
@@ -502,9 +502,9 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 			case 20280:
 			case 20281:
 #ifdef ENABLE_STANDING_MOUNT
-			case 40003:		// Standing Mount: Turbo Sörf Tahtasý
-			case 40004:		// Standing Mount: Wukong'un Fýrtýnasý
-			case 40005:		// Standing Mount: Wukong'un Gürlemesi
+			case 40003:		// Standing Mount: Turbo Sï¿½rf Tahtasï¿½
+			case 40004:		// Standing Mount: Wukong'un Fï¿½rtï¿½nasï¿½
+			case 40005:		// Standing Mount: Wukong'un Gï¿½rlemesi
 #endif
 				break;
 
